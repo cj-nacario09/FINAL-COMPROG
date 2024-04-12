@@ -10,7 +10,7 @@
 typedef struct
 {
     int column;
-    int row; // Lot[0] = Row Lot[1] = Column
+    int row;
     char fullname[21];
     int BirthMonth;
     int BirthDay;
@@ -125,7 +125,10 @@ int main()
 
             // Display the Lot visuals
             PLot(Lot);
-            do
+            for (int i = 0; i < MAX_ENT; i++)
+            {
+                printf("\nindex: %d name:%s\n", i, deads[i].fullname);
+            }
             {
                 printf("\n%55s\n", "Choose one of the Options below:");
                 printf("%55s\n", "1. Choose Lot");
@@ -145,6 +148,9 @@ int main()
                 }
 
             } while (LvisMenu != 1 && LvisMenu != 2);
+            
+        
+            
 
             fseek(ifp, 0, SEEK_SET);
             break;
