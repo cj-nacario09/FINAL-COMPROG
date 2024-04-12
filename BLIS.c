@@ -9,7 +9,8 @@
 
 typedef struct
 {
-    int Lot[2]; // Lot[0] = Row Lot[1] = Column
+    int column;
+    int row; // Lot[0] = Row Lot[1] = Column
     char fullname[21];
     int BirthMonth;
     int BirthDay;
@@ -17,16 +18,40 @@ typedef struct
     int DeathMonth;
     int DeathDay;
     int DeathYear;
-    char qoute[51];
 } Info;
+
+Info Read_Entry(FILE *fileptr)
+{
+    Info entry;
+    char colLetter;
+    // Read lot coordinates
+    fscanf(fileptr, " %c %d", &colLetter, &entry.row);
+    entry.column = toupper(colLetter) - 'A'; // Convert letter to column index
+
+    // Read rest of the information
+    fscanf(fileptr, "%20s", entry.fullname);
+    fscanf(fileptr, "%d", &entry.BirthMonth);
+    fscanf(fileptr, "%d", &entry.BirthDay);
+    fscanf(fileptr, "%d", &entry.BirthYear);
+    fscanf(fileptr, "%d", &entry.DeathMonth);
+    fscanf(fileptr, "%d", &entry.DeathDay);
+    fscanf(fileptr, "%d", &entry.DeathYear);
+
+    return entry;
+}
+
+void MarkLot(char Lot[][Max_col], Info Sentry)
+{
+    Lot[Sentry.row - 1][Sentry.column - 1] = 'X'; // Mark the lot based on 1-based indexing
+}
 
 void PLot(char Lot[][Max_col])
 {
     printf("\t\t--------------------------------------------------------------\n");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < Max_row; i++)
     {
         printf("\t\t| ");
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < Max_col; j++)
         {
             printf("  %c  |", Lot[i][j]);
         }
@@ -34,45 +59,17 @@ void PLot(char Lot[][Max_col])
     }
 }
 
-Info Read_Entry(FILE *fileptr)
-{
-    Info entry;
-    char colLetter;
-
-    // Read lot coordinates
-    if (fscanf(fileptr, " %c %d", &colLetter, &entry.Lot[0]) != 2)
-        return entry; // Return empty entry if unable to read
-
-    entry.Lot[1] = toupper(colLetter) - 'A';
-
-    // Read rest of the information
-    fgets(entry.fullname, sizeof(entry.fullname), fileptr);
-    fscanf(fileptr, "%d", &entry.BirthMonth);
-    fscanf(fileptr, "%d", &entry.BirthDay);
-    fscanf(fileptr, "%d", &entry.BirthYear);
-    fscanf(fileptr, "%d", &entry.DeathMonth);
-    fscanf(fileptr, "%d", &entry.DeathDay);
-    fscanf(fileptr, "%d", &entry.DeathYear);
-    fgets(entry.qoute, sizeof(entry.qoute), fileptr);
-
-    return entry;
-}
-
-void MarkLot(char Lot[][Max_col], Info Sentry)
-{
-    Lot[Sentry.Lot[0] - 1][Sentry.Lot[1]] = 'X';
-}
-
 int main()
 {
-    int Menu_Option;     // Variable for Menu
-    Info deads[MAX_ENT]; // Arrays of Struct, 100
-    char Lot[10][10];    // 10x10 matrix for Lot
+    int Menu_Option;
+    int LvisMenu;               // Variable for Menu
+    Info deads[MAX_ENT];        // Arrays of Struct, 100
+    char Lot[Max_row][Max_col]; // 10x10 matrix for Lot
 
-    // Intialize Lot as empty
-    for (int i = 0; i < 10; i++)
+    // Initialize Lot as empty
+    for (int i = 0; i < Max_row; i++)
     {
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < Max_col; j++)
         {
             Lot[i][j] = ' ';
         }
@@ -81,8 +78,14 @@ int main()
     FILE *ifp; // File pointer for input
     FILE *ofp; // File pointer for Output
 
-    ifp = fopen("MASTERLIST.txt", "r");
-    ofp = fopen("Copylist.txt", "w");
+    ifp = fopen("MASTERLIST.txt", "rt");
+    ofp = fopen("Copylist.txt", "wt");
+
+    if (!ifp || !ofp)
+    {
+        printf("Error opening files.\n");
+        return 1;
+    }
 
     while (1)
     {
@@ -97,32 +100,56 @@ int main()
         printf("Option:");
         scanf("%d", &Menu_Option);
 
+        Info entry;
+        char colLetter;
+
         switch (Menu_Option)
         {
         case 1:
             break;
         case 2: // Lot Visualization
-            while (1)
+            memset(deads, 0, sizeof(deads));
+            memset(Lot, ' ', sizeof(Lot));
+            int index = 0;
+            while (!feof(ifp))
             {
-                // Read entry from the file
-                Info Sentry = Read_Entry(ifp);
-
-                if (!feof(ifp))
-                    break; // break if EOF reached
-
-                // Calculate index in the deads array based on the lot coordinates
-                int index = (Sentry.Lot[0] - 1) * 10 + (Sentry.Lot[1] - 'A');
-
-                // Store the entry in the corresponding position of the deads array
-                deads[index] = Sentry;
-
-                // Mark the lot
-                MarkLot(Lot, Sentry);
+                Info entry = Read_Entry(ifp);
+                // Mark the lot and store the entry
+                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 1 && entry.column <= Max_col)
+                {
+                    index = ((entry.row - 1) * 10 + (entry.column)) - 3;
+                    deads[index] = entry;
+                    MarkLot(Lot, entry);
+                }
             }
-            PLot(Lot);
 
+            // Display the Lot visuals
+            PLot(Lot);
+            do
+            {
+                printf("\n%55s\n", "Choose one of the Options below:");
+                printf("%55s\n", "1. Choose Lot");
+                printf("%54s\n", "2. Main Menu");
+                printf("Option:");
+                scanf("%d", &LvisMenu);
+
+                switch (LvisMenu)
+                {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                default:
+                    printf("Not an option, Try Again\n");
+                    break;
+                }
+
+            } while (LvisMenu != 1 && LvisMenu != 2);
+
+            fseek(ifp, 0, SEEK_SET);
             break;
-        case 3: // Paclage Descriptions
+
+        case 3: // Package Descriptions
             printf("\t\tA: Normal\n");
             printf("\t\t\tThis package includes the burial plot itself, the\n\t\t\topening and closing of the grave and a grave care\n\t\t\tof once every 6 months.\n");
             printf("\t\tB: Premium\n");
@@ -134,15 +161,14 @@ int main()
             break;
         case 4: // Exit Program
             printf("Exiting Program...\n");
+            fclose(ifp);
+            fclose(ofp);
             exit(0);
-            break;
         default: // Loop if Not an Option
             printf("Not an option, Try Again\n");
             break;
         }
     }
 
-    fclose(ifp);
-    fclose(ofp);
     return 0;
 }
