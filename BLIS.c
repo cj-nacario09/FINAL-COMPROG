@@ -23,12 +23,10 @@ typedef struct
 Info Read_Entry(FILE *fileptr)
 {
     Info entry;
-    char colLetter;
+    char coletter;
     // Read lot coordinates
-    fscanf(fileptr, " %c %d", &colLetter, &entry.row);
-    entry.column = toupper(colLetter) - 'A'; // Convert letter to column index
-
-    // Read rest of the information
+    fscanf(fileptr, " %c-%d", &coletter, &entry.row);
+    entry.column = toupper(coletter) - 'A';
     fscanf(fileptr, "%20s", entry.fullname);
     fscanf(fileptr, "%d", &entry.BirthMonth);
     fscanf(fileptr, "%d", &entry.BirthDay);
@@ -40,22 +38,23 @@ Info Read_Entry(FILE *fileptr)
     return entry;
 }
 
-void MarkLot(char Lot[][Max_col], Info Sentry)
+void MarkLot(char Lot[][Max_col], Info entry)
 {
-    Lot[Sentry.row - 1][Sentry.column - 1] = 'X'; // Mark the lot based on 1-based indexing
+    Lot[entry.row - 1][entry.column] = 'X'; // Mark the lot based on 1-based indexing
 }
 
 void PLot(char Lot[][Max_col])
 {
-    printf("\t\t--------------------------------------------------------------\n");
+    printf("\t\t       A     B     C     D     E     F     G     H     I     J\n");
+    printf("\t\t   --------------------------------------------------------------\n");
     for (int i = 0; i < Max_row; i++)
     {
-        printf("\t\t| ");
+        printf("\t\t%3d| ", i + 1);
         for (int j = 0; j < Max_col; j++)
         {
             printf("  %c  |", Lot[i][j]);
         }
-        printf("\n\t\t--------------------------------------------------------------\n");
+        printf("\n\t\t   --------------------------------------------------------------\n");
     }
 }
 
@@ -101,7 +100,6 @@ int main()
         scanf("%d", &Menu_Option);
 
         Info entry;
-        char colLetter;
 
         switch (Menu_Option)
         {
@@ -111,29 +109,30 @@ int main()
             memset(deads, 0, sizeof(deads));
             memset(Lot, ' ', sizeof(Lot));
             int index = 0;
-            while (!feof(ifp))
+            while (1)
             {
-                Info entry = Read_Entry(ifp);
-                // Mark the lot and store the entry
-                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 1 && entry.column <= Max_col)
+
+                entry = Read_Entry(ifp);
+
+                if (feof(ifp) || ferror(ifp))
+                    break;
+
+                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
                 {
-                    index = ((entry.row - 1) * 10 + (entry.column)) - 3;
+                    index = ((entry.row - 1) * Max_row) + entry.column;
                     deads[index] = entry;
                     MarkLot(Lot, entry);
                 }
             }
-
             // Display the Lot visuals
             PLot(Lot);
-            for (int i = 0; i < MAX_ENT; i++)
-            {
-                printf("\nindex: %d name:%s\n", i, deads[i].fullname);
-            }
+            do
             {
                 printf("\n%55s\n", "Choose one of the Options below:");
                 printf("%55s\n", "1. Choose Lot");
                 printf("%54s\n", "2. Main Menu");
-                printf("Option:");
+                printf("%49s\n", "3. Exit");
+                printf("Option: ");
                 scanf("%d", &LvisMenu);
 
                 switch (LvisMenu)
@@ -142,15 +141,17 @@ int main()
                     break;
                 case 2:
                     break;
+                case 3:
+                    printf("Exiting Program...\n");
+                    fclose(ifp);
+                    fclose(ofp);
+                    exit(0);
                 default:
                     printf("Not an option, Try Again\n");
                     break;
                 }
 
             } while (LvisMenu != 1 && LvisMenu != 2);
-            
-        
-            
 
             fseek(ifp, 0, SEEK_SET);
             break;
