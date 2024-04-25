@@ -26,6 +26,7 @@ Info Read_Entry(FILE *fileptr);
 void MarkLot(char Lot[][Max_col], Info entry);
 void PLot(char Lot[][Max_col]);
 void Print_info(int col, int row, Info deads[MAX_ENT]);
+void cMonth(int num_month, char *monthptr);
 
 int main()
 {
@@ -239,90 +240,8 @@ void Print_info(int col, int row, Info deads[MAX_ENT])
     index = ((row - 1) * Max_row) + col;
     printf("\n");
 
-    switch (deads[index].BirthMonth)
-    {
-    case 1:
-        strcpy(bmonth, "January");
-        break;
-    case 2:
-        strcpy(bmonth, "February");
-        break;
-    case 3:
-        strcpy(bmonth, "March");
-        break;
-    case 4:
-        strcpy(bmonth, "April");
-        break;
-    case 5:
-        strcpy(bmonth, "May");
-        break;
-    case 6:
-        strcpy(bmonth, "June");
-        break;
-    case 7:
-        strcpy(bmonth, "July");
-        break;
-    case 8:
-        strcpy(bmonth, "August");
-        break;
-    case 9:
-        strcpy(bmonth, "September");
-        break;
-    case 10:
-        strcpy(bmonth, "October");
-        break;
-    case 11:
-        strcpy(bmonth, "November");
-        break;
-    case 12:
-        strcpy(bmonth, "December");
-        break;
-    default:
-        break;
-    }
-
-     switch (deads[index].DeathMonth)
-    {
-    case 1:
-        strcpy(dmonth, "January");
-        break;
-    case 2:
-        strcpy(dmonth, "February");
-        break;
-    case 3:
-        strcpy(dmonth, "March");
-        break;
-    case 4:
-        strcpy(dmonth, "April");
-        break;
-    case 5:
-        strcpy(dmonth, "May");
-        break;
-    case 6:
-        strcpy(dmonth, "June");
-        break;
-    case 7:
-        strcpy(dmonth, "July");
-        break;
-    case 8:
-        strcpy(dmonth, "August");
-        break;
-    case 9:
-        strcpy(dmonth, "September");
-        break;
-    case 10:
-        strcpy(dmonth, "October");
-        break;
-    case 11:
-        strcpy(dmonth, "November");
-        break;
-    case 12:
-        strcpy(dmonth, "December");
-        break;
-    default:
-        break;
-    }
-
+    cMonth(deads[index].BirthMonth, bmonth);
+    cMonth(deads[index].DeathMonth, dmonth);
 
     if (strcmp(deads[index].fullname, "") == 0)
     {
@@ -339,5 +258,52 @@ void Print_info(int col, int row, Info deads[MAX_ENT])
     else
     {
         printf("Error.....");
+    }
+}
+
+
+void cMonth(int num_month, char *monthptr)
+{
+    
+    switch (num_month)
+    {
+    case 1:
+        strcpy(monthptr, "January");
+        break;
+    case 2:
+        strcpy(monthptr, "February");
+        break;
+    case 3:
+        strcpy(monthptr, "March");
+        break;
+    case 4:
+        strcpy(monthptr, "April");
+        break;
+    case 5:
+        strcpy(monthptr, "May");
+        break;
+    case 6:
+        strcpy(monthptr, "June");
+        break;
+    case 7:
+        strcpy(monthptr, "July");
+        break;
+    case 8:
+        strcpy(monthptr, "August");
+        break;
+    case 9:
+        strcpy(monthptr, "September");
+        break;
+    case 10:
+        strcpy(monthptr, "October");
+        break;
+    case 11:
+        strcpy(monthptr, "November");
+        break;
+    case 12:
+        strcpy(monthptr, "December");
+        break;
+    default:
+        break;
     }
 }
