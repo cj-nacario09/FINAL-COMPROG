@@ -6,13 +6,12 @@
 #define MAX_ENT 100
 #define Max_col 10
 #define Max_row 10
-#define MAX_STR 50
 
 typedef struct
 {
     int column;
-    int row;
-    char fullname[MAX_STR];
+    int row; // Lot[0] = Row Lot[1] = Column
+    char fullname[21];
     int BirthMonth;
     int BirthDay;
     int BirthYear;
@@ -21,32 +20,71 @@ typedef struct
     int DeathYear;
 } Info;
 
-Info Read_Entry(FILE *fileptr);
-void MarkLot(char Lot[][Max_col], Info entry);
-void PLot(char Lot[][Max_col]);
-void Print_info(int col, int row, Info deads[MAX_ENT]);
+Info Read_Entry(FILE *fileptr)
+{
+    Info entry;
+    char colLetter;
+    // Read lot coordinates
+    fscanf(fileptr, " %c %d", &colLetter, &entry.row);
+    entry.column = toupper(colLetter) - 'A'; // Convert letter to column index
+
+    // Read rest of the information
+    fscanf(fileptr, "%20s", entry.fullname);
+    fscanf(fileptr, "%d", &entry.BirthMonth);
+    fscanf(fileptr, "%d", &entry.BirthDay);
+    fscanf(fileptr, "%d", &entry.BirthYear);
+    fscanf(fileptr, "%d", &entry.DeathMonth);
+    fscanf(fileptr, "%d", &entry.DeathDay);
+    fscanf(fileptr, "%d", &entry.DeathYear);
+
+    return entry;
+}
+
+void MarkLot(char Lot[][Max_col], Info Sentry)
+{
+    Lot[Sentry.row - 1][Sentry.column - 1] = 'X'; // Mark the lot based on 1-based indexing
+}
+
+void PLot(char Lot[][Max_col])
+{
+    printf("\t\t--------------------------------------------------------------\n");
+    for (int i = 0; i < Max_row; i++)
+    {
+        printf("\t\t| ");
+        for (int j = 0; j < Max_col; j++)
+        {
+            printf("  %c  |", Lot[i][j]);
+        }
+        printf("\n\t\t--------------------------------------------------------------\n");
+    }
+}
 
 int main()
-{
+{   
+
+    char fullname[100]; 
+    int BirthMonth, BirthDay, BirthYear;
+    int DeathMonth, DeathDay, DeathYear;
+
     int Menu_Option;
     int LvisMenu;               // Variable for Menu
     Info deads[MAX_ENT];        // Arrays of Struct, 100
     char Lot[Max_row][Max_col]; // 10x10 matrix for Lot
-    char colid;                 // Char Version of Column
-    int row_id, column_id;      // Column and Row
-    Info entry;                 // For entry/ Scanning from file
-    int index = 0;              // Index in the array from row and column
-    int again;                  // Variable for the loop in Choosing Lot Info
 
-    // Initialize Lot and the array deads as empty
-    memset(deads, 0, sizeof(deads));
-    memset(Lot, ' ', sizeof(Lot));
+    // Initialize Lot as empty
+    for (int i = 0; i < Max_row; i++)
+    {
+        for (int j = 0; j < Max_col; j++)
+        {
+            Lot[i][j] = ' ';
+        }
+    }
 
     FILE *ifp; // File pointer for input
     FILE *ofp; // File pointer for Output
 
-    ifp = fopen("MASTERLIST.txt", "rt");
-    ofp = fopen("Copylist.txt", "wt");
+    ifp = fopen("MASTERLIST.txt", "r");
+    ofp = fopen("Copylist.txt", "w");
 
     if (!ifp || !ofp)
     {
@@ -67,89 +105,93 @@ int main()
         printf("Option:");
         scanf("%d", &Menu_Option);
 
+        Info entry;
+        char colLetter;
+
         switch (Menu_Option)
         {
         case 1:
-            break;
-        case 2: // Lot Visualization
-            while (1)
-            {
+            printf("\nEnter full Name: ");
+            scanf(" %[^\n]", fullname);
+            printf("Enter Birth Month: ");
+            scanf("%d", &BirthMonth);
+            printf("Enter Birth Day: ");
+            scanf("%d", &BirthDay);
+            printf("Enter Birth Year: ");
+            scanf("%d", &BirthYear);
+            printf("Enter Month of death: ");
+            scanf("%d", &DeathMonth);
+            printf("Enter date of death: ");
+            scanf("%d", &DeathDay);
+            printf("Enter year of death: ");
+            scanf("%d", &DeathYear);
 
-                entry = Read_Entry(ifp);
-
-                if (feof(ifp) || ferror(ifp))
-                    break;
-
-                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
-                {
-                    index = ((entry.row - 1) * Max_row) + entry.column;
-                    deads[index] = entry;
-                    MarkLot(Lot, entry);
-                }
-            }
-            // Display the Lot visuals
             PLot(Lot);
-            do
+            
             {
                 printf("\n%55s\n", "Choose one of the Options below:");
                 printf("%55s\n", "1. Choose Lot");
                 printf("%54s\n", "2. Main Menu");
-                printf("%49s\n", "3. Exit");
-                printf("Option: ");
+                printf("Option:");
                 scanf("%d", &LvisMenu);
 
                 switch (LvisMenu)
                 {
                 case 1:
-                do
-                {
-                    printf("\nEnter Lot(Column-Row): ");
-                    scanf(" %c-%d", &colid, &row_id);
-
-                    column_id = toupper(colid) - 'A';
-
-                    Print_info(column_id, row_id, deads);
-                    printf("\n%55s\n", "Choose one of the Options below:");
-                    printf("%57s\n", "1. Choose Again");
-                    printf("%54s\n", "2. Main Menu");
-                    printf("%49s\n", "3. Exit");
-                    printf("Option: ");
-                    scanf("%d", &again);
-
-                    switch (again)
-                    {
-                    case 1:
-                        PLot(Lot);
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        printf("Exiting Program...\n");
-                        fclose(ifp);
-                        fclose(ofp);
-                        exit(0);
-                    default:
-                        printf("Not an option, Try Again\n");
-                        printf("\n");
-                        break;
-                    }
-                } while (again != 3 && again != 2);
+                    break;
                 case 2:
                     break;
-                case 3:
-                    printf("Exiting Program...\n");
-                    fclose(ifp);
-                    fclose(ofp);
-                    exit(0);
                 default:
                     printf("Not an option, Try Again\n");
-                    printf("\n");
                     break;
                 }
 
             } while (LvisMenu != 1 && LvisMenu != 2);
 
-            // fseek(ifp, 0, SEEK_SET);
+            fseek(ifp, 0, SEEK_SET);
+            break;
+
+        case 2: // Lot Visualization
+            memset(deads, 0, sizeof(deads));
+            memset(Lot, ' ', sizeof(Lot));
+            int index = 0;
+            while (!feof(ifp))
+            {
+                Info entry = Read_Entry(ifp);
+                // Mark the lot and store the entry
+                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 1 && entry.column <= Max_col)
+                {
+                    index = ((entry.row - 1) * 10 + (entry.column)) - 3;
+                    deads[index] = entry;
+                    MarkLot(Lot, entry);
+                }
+            }
+
+            // Display the Lot visuals
+            PLot(Lot);
+
+            // menu option
+            {
+                printf("\n%55s\n", "Choose one of the Options below:");
+                printf("%55s\n", "1. Choose Lot");
+                printf("%54s\n", "2. Main Menu");
+                printf("Option:");
+                scanf("%d", &LvisMenu);
+
+                switch (LvisMenu)
+                {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                default:
+                    printf("Not an option, Try Again\n");
+                    break;
+                }
+
+            } while (LvisMenu != 1 && LvisMenu != 2);
+
+            fseek(ifp, 0, SEEK_SET);
             break;
 
         case 3: // Package Descriptions
@@ -174,62 +216,4 @@ int main()
     }
 
     return 0;
-}
-
-Info Read_Entry(FILE *fileptr)
-{
-    Info entry;
-    char coletter;
-    // Read lot coordinates
-    fscanf(fileptr, " %c-%d", &coletter, &entry.row);
-    entry.column = toupper(coletter) - 'A';
-    fscanf(fileptr, " %[^\n]", entry.fullname);
-    fscanf(fileptr, "%d", &entry.BirthMonth);
-    fscanf(fileptr, "%d", &entry.BirthDay);
-    fscanf(fileptr, "%d", &entry.BirthYear);
-    fscanf(fileptr, "%d", &entry.DeathMonth);
-    fscanf(fileptr, "%d", &entry.DeathDay);
-    fscanf(fileptr, "%d", &entry.DeathYear);
-
-    return entry;
-}
-
-void MarkLot(char Lot[][Max_col], Info entry)
-{
-    Lot[entry.row - 1][entry.column] = 'X'; // Mark the lot based on 1-based indexing
-}
-
-void PLot(char Lot[][Max_col])
-{
-    printf("\t\t       A     B     C     D     E     F     G     H     I     J\n");
-    printf("\t\t   --------------------------------------------------------------\n");
-    for (int i = 0; i < Max_row; i++)
-    {
-        printf("\t\t%3d| ", i + 1);
-        for (int j = 0; j < Max_col; j++)
-        {
-            printf("  %c  |", Lot[i][j]);
-        }
-        printf("\n\t\t   --------------------------------------------------------------\n");
-    }
-}
-
-void Print_info(int col, int row, Info deads[MAX_ENT])
-{
-    int index;
-    index = ((row - 1) * Max_row) + col;
-    printf("\n");
-    if (strcmp(deads[index].fullname, "") == 0)
-    {
-        printf("\nNo info yet.");
-    }
-    else if (strcmp(deads[index].fullname, "") != 0)
-    {
-        printf("\n\nName: %s", deads[index].fullname);
-        printf("\nBirthday: %d/%d/%d", deads[index].BirthMonth, deads[index].BirthDay, deads[index].BirthYear);
-    }
-    else
-    {
-        printf("Error.....");
-    }
 }
