@@ -3,7 +3,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_ENT 100
+#define MAX_ENT 150
 #define Max_col 10
 #define Max_row 10
 #define MAX_STR 50
@@ -19,6 +19,7 @@ typedef struct
     int DeathMonth;
     int DeathDay;
     int DeathYear;
+    char qoute[MAX_STR];
 } Info;
 
 Info Read_Entry(FILE *fileptr);
@@ -101,40 +102,45 @@ int main()
                 switch (LvisMenu)
                 {
                 case 1:
-                do
-                {
-                    printf("\nEnter Lot(Column-Row): ");
-                    scanf(" %c-%d", &colid, &row_id);
-
-                    column_id = toupper(colid) - 'A';
-
-                    Print_info(column_id, row_id, deads);
-                    printf("\n%55s\n", "Choose one of the Options below:");
-                    printf("%57s\n", "1. Choose Again");
-                    printf("%54s\n", "2. Main Menu");
-                    printf("%49s\n", "3. Exit");
-                    printf("Option: ");
-                    scanf("%d", &again);
-
-                    switch (again)
+                    do
                     {
-                    case 1:
-                        PLot(Lot);
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        printf("Exiting Program...\n");
-                        fclose(ifp);
-                        fclose(ofp);
-                        exit(0);
-                    default:
-                        printf("Not an option, Try Again\n");
-                        printf("\n");
-                        break;
-                    }
-                } while (again != 3 && again != 2);
+
+                        printf("\nEnter Lot(Column-Row): ");
+                        scanf(" %c-%d", &colid, &row_id);
+
+                        column_id = toupper(colid) - 'A';
+
+                        Print_info(column_id, row_id, deads);
+
+                        printf("\n%55s\n", "Choose one of the Options below:");
+                        printf("%57s\n", "1. Choose Again");
+                        printf("%54s\n", "2. Main Menu");
+                        printf("%49s\n", "3. Exit");
+                        printf("Option: ");
+                        scanf("%d", &again);
+
+                        switch (again)
+                        {
+                        case 1:
+                            PLot(Lot);
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            printf("Exiting Program...\n");
+                            fclose(ifp);
+                            fclose(ofp);
+                            exit(0);
+                        default:
+                            printf("Not an option, Try Again\n");
+                            printf("\n");
+                            break;
+                        }
+
+                    } while (again != 2);
+                    break;
                 case 2:
+                    printf("\e[1;1H\e[2J");
                     break;
                 case 3:
                     printf("Exiting Program...\n");
@@ -147,7 +153,13 @@ int main()
                     break;
                 }
 
-            } while (LvisMenu != 1 && LvisMenu != 2);
+                if (again == 2)
+                {
+                    printf("\e[1;1H\e[2J");
+                    break;
+                }
+
+            } while (LvisMenu != 2 && LvisMenu != 3);
 
             // fseek(ifp, 0, SEEK_SET);
             break;
@@ -190,6 +202,7 @@ Info Read_Entry(FILE *fileptr)
     fscanf(fileptr, "%d", &entry.DeathMonth);
     fscanf(fileptr, "%d", &entry.DeathDay);
     fscanf(fileptr, "%d", &entry.DeathYear);
+    fscanf(fileptr, " %[^\n]", entry.qoute);
 
     return entry;
 }
@@ -217,16 +230,111 @@ void PLot(char Lot[][Max_col])
 void Print_info(int col, int row, Info deads[MAX_ENT])
 {
     int index;
+    char colleter;
+    char bmonth[MAX_STR];
+    char dmonth[MAX_STR];
+
+    colleter = 'A' + col;
+
     index = ((row - 1) * Max_row) + col;
     printf("\n");
+
+    switch (deads[index].BirthMonth)
+    {
+    case 1:
+        strcpy(bmonth, "January");
+        break;
+    case 2:
+        strcpy(bmonth, "February");
+        break;
+    case 3:
+        strcpy(bmonth, "March");
+        break;
+    case 4:
+        strcpy(bmonth, "April");
+        break;
+    case 5:
+        strcpy(bmonth, "May");
+        break;
+    case 6:
+        strcpy(bmonth, "June");
+        break;
+    case 7:
+        strcpy(bmonth, "July");
+        break;
+    case 8:
+        strcpy(bmonth, "August");
+        break;
+    case 9:
+        strcpy(bmonth, "September");
+        break;
+    case 10:
+        strcpy(bmonth, "October");
+        break;
+    case 11:
+        strcpy(bmonth, "November");
+        break;
+    case 12:
+        strcpy(bmonth, "December");
+        break;
+    default:
+        break;
+    }
+
+     switch (deads[index].DeathMonth)
+    {
+    case 1:
+        strcpy(dmonth, "January");
+        break;
+    case 2:
+        strcpy(dmonth, "February");
+        break;
+    case 3:
+        strcpy(dmonth, "March");
+        break;
+    case 4:
+        strcpy(dmonth, "April");
+        break;
+    case 5:
+        strcpy(dmonth, "May");
+        break;
+    case 6:
+        strcpy(dmonth, "June");
+        break;
+    case 7:
+        strcpy(dmonth, "July");
+        break;
+    case 8:
+        strcpy(dmonth, "August");
+        break;
+    case 9:
+        strcpy(dmonth, "September");
+        break;
+    case 10:
+        strcpy(dmonth, "October");
+        break;
+    case 11:
+        strcpy(dmonth, "November");
+        break;
+    case 12:
+        strcpy(dmonth, "December");
+        break;
+    default:
+        break;
+    }
+
+
     if (strcmp(deads[index].fullname, "") == 0)
     {
         printf("\nNo info yet.");
     }
     else if (strcmp(deads[index].fullname, "") != 0)
     {
-        printf("\n\nName: %s", deads[index].fullname);
-        printf("\nBirthday: %d/%d/%d", deads[index].BirthMonth, deads[index].BirthDay, deads[index].BirthYear);
+        printf("\n\nLot: %c-%d", colleter, deads[index].row);
+        printf("\nName: %s", deads[index].fullname);
+        printf("\nBirthday: %s/%d/%d", bmonth, deads[index].BirthDay, deads[index].BirthYear);
+        printf("\nDate of Death: %s/%d/%d\n", dmonth, deads[index].DeathDay, deads[index].DeathYear);
+        printf("Qoute: %s\n", deads[index].qoute);
     }
     else
     {
