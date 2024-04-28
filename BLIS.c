@@ -3,10 +3,20 @@
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_ENT 150
+#define MAX_ENT 100
 #define Max_col 10
 #define Max_row 10
 #define MAX_STR 50
+
+typedef struct
+{
+    int column;
+    int row;
+    float size1;
+    float size2;
+    int Price;
+    char status[MAX_STR];
+} Lot_Info;
 
 typedef struct
 {
@@ -23,34 +33,43 @@ typedef struct
 } Info;
 
 Info Read_Entry(FILE *fileptr);
+Lot_Info Lot_details(FILE *lotptr);
 void MarkLot(char Lot[][Max_col], Info entry);
 void PLot(char Lot[][Max_col]);
-void Print_info(int col, int row, Info deads[MAX_ENT]);
+void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT]);
 void cMonth(int num_month, char *monthptr);
 
 int main()
 {
     int Menu_Option;
-    int LvisMenu;               // Variable for Menu
-    Info deads[MAX_ENT];        // Arrays of Struct, 100
+    int LvisMenu;  // Variable for Menu
+    int index = 0; // Index in the array from row and column
+    int Lot_index = 0;
+    int again;             // Variable for the loop in Choosing Lot Info
+    int row_id, column_id; // Column and Row
+
+    Info deads[MAX_ENT]; // Arrays of Struct, 100
+    Lot_Info lotdet[MAX_ENT];
+    Info entry;         // For the masterlits file with taken lot
+    Lot_Info lot_entry; // For scanning the lot details
+
     char Lot[Max_row][Max_col]; // 10x10 matrix for Lot
     char colid;                 // Char Version of Column
-    int row_id, column_id;      // Column and Row
-    Info entry;                 // For entry/ Scanning from file
-    int index = 0;              // Index in the array from row and column
-    int again;                  // Variable for the loop in Choosing Lot Info
 
     // Initialize Lot and the array deads as empty
     memset(deads, 0, sizeof(deads));
+    memset(lotdet, 0, sizeof(lotdet));
     memset(Lot, ' ', sizeof(Lot));
 
     FILE *ifp; // File pointer for input
     FILE *ofp; // File pointer for Output
+    FILE *lfp; // File pointer for lot input file
 
     ifp = fopen("MASTERLIST.txt", "rt");
     ofp = fopen("Copylist.txt", "wt");
+    lfp = fopen("Lotfile.txt", "rt");
 
-    if (!ifp || !ofp)
+    if (!ifp || !ofp || !lfp)
     {
         printf("Error opening files.\n");
         return 1;
@@ -78,8 +97,9 @@ int main()
             {
 
                 entry = Read_Entry(ifp);
+                lot_entry = Lot_details(lfp);
 
-                if (feof(ifp) || ferror(ifp))
+                if (feof(ifp) && ferror(ifp) || feof(lfp) || ferror(lfp))
                     break;
 
                 if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
@@ -87,6 +107,12 @@ int main()
                     index = ((entry.row - 1) * Max_row) + entry.column;
                     deads[index] = entry;
                     MarkLot(Lot, entry);
+                }
+
+                if (lot_entry.row >= 1 && lot_entry.row <= Max_row && lot_entry.column >= 0 && lot_entry.column <= Max_col)
+                {
+                    Lot_index = ((lot_entry.row - 1) * Max_row) + lot_entry.column;
+                    lotdet[Lot_index] = lot_entry;
                 }
             }
             // Display the Lot visuals
@@ -111,7 +137,7 @@ int main()
 
                         column_id = toupper(colid) - 'A';
 
-                        Print_info(column_id, row_id, deads);
+                        Print_info(column_id, row_id, deads, lotdet);
 
                         printf("\n%55s\n", "Choose one of the Options below:");
                         printf("%57s\n", "1. Choose Again");
@@ -208,6 +234,21 @@ Info Read_Entry(FILE *fileptr)
     return entry;
 }
 
+Lot_Info Lot_details(FILE *lotptr)
+{
+    Lot_Info loentr;
+    char lettercol;
+
+    fscanf(lotptr, " %c-%d", &lettercol, &loentr.row);
+    loentr.column = toupper(lettercol) - 'A';
+    fscanf(lotptr, "%f", &loentr.size1);
+    fscanf(lotptr, "%f", &loentr.size2);
+    fscanf(lotptr, "%d", &loentr.Price);
+    fscanf(lotptr, " %[^\n]", loentr.status);
+
+    return loentr;
+}
+
 void MarkLot(char Lot[][Max_col], Info entry)
 {
     Lot[entry.row - 1][entry.column] = 'X'; // Mark the lot based on 1-based indexing
@@ -228,43 +269,9 @@ void PLot(char Lot[][Max_col])
     }
 }
 
-void Print_info(int col, int row, Info deads[MAX_ENT])
-{
-    int index;
-    char colleter;
-    char bmonth[MAX_STR];
-    char dmonth[MAX_STR];
-
-    colleter = 'A' + col;
-
-    index = ((row - 1) * Max_row) + col;
-    printf("\n");
-
-    cMonth(deads[index].BirthMonth, bmonth);
-    cMonth(deads[index].DeathMonth, dmonth);
-
-    if (strcmp(deads[index].fullname, "") == 0)
-    {
-        printf("\nNo info yet.");
-    }
-    else if (strcmp(deads[index].fullname, "") != 0)
-    {
-        printf("\n\nLot: %c-%d", colleter, deads[index].row);
-        printf("\nName: %s", deads[index].fullname);
-        printf("\nBirthday: %s/%d/%d", bmonth, deads[index].BirthDay, deads[index].BirthYear);
-        printf("\nDate of Death: %s/%d/%d\n", dmonth, deads[index].DeathDay, deads[index].DeathYear);
-        printf("Qoute: %s\n", deads[index].qoute);
-    }
-    else
-    {
-        printf("Error.....");
-    }
-}
-
-
 void cMonth(int num_month, char *monthptr)
 {
-    
+
     switch (num_month)
     {
     case 1:
@@ -305,5 +312,49 @@ void cMonth(int num_month, char *monthptr)
         break;
     default:
         break;
+    }
+}
+
+void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
+{
+    int index;
+    char colleter;
+    char reserve[MAX_STR] = "reserve";
+    char bmonth[MAX_STR];
+    char dmonth[MAX_STR];
+
+    colleter = 'A' + col;
+
+    index = ((row - 1) * Max_row) + col;
+    printf("\n");
+
+    cMonth(deads[index].BirthMonth, bmonth);
+    cMonth(deads[index].DeathMonth, dmonth);
+
+    if (strcmp(deads[index].fullname, "") != 0 && strcmp(lotdet[index].status, "taken") == 0)
+    {
+        printf("\n\nLot: %c-%d", colleter, deads[index].row);
+        printf("\nName: %s", deads[index].fullname);
+        printf("\nBirthday: %s/%d/%d", bmonth, deads[index].BirthDay, deads[index].BirthYear);
+        printf("\nDate of Death: %s/%d/%d\n", dmonth, deads[index].DeathDay, deads[index].DeathYear);
+        printf("Qoute: %s\n", deads[index].qoute);
+    }
+    else
+    {
+        printf("\n\nLot: %c-%d\n", colleter, lotdet[index].row);
+        printf("\nSize: %.2fm x %.2fm\n", lotdet[index].size1, lotdet[index].size2);
+        printf("Price: PHP%d\n", lotdet[index].Price);
+        if (strcmp(lotdet[index].status, "reserve") == 0)
+        {
+            printf("Status: Reserve\n");
+        }
+        else if (strcmp(lotdet[index].status, "taken") == 0)
+        {
+            printf("Status: Taken\n");
+        }
+        else if (strcmp(lotdet[index].status, "free") == 0)
+        {
+            printf("Status: Free\n");
+        }
     }
 }
