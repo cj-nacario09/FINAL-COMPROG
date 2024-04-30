@@ -137,6 +137,12 @@ int main()
 
                         column_id = toupper(colid) - 'A';
 
+                        if (column_id < 0 || column_id > ('J' - 'A') || row_id < 0 || row_id > Max_row)
+                        {
+                            printf("Not an option. Try Again\n");
+                            break;
+                        }
+
                         Print_info(column_id, row_id, deads, lotdet);
 
                         printf("\n%55s\n", "Choose one of the Options below:");
