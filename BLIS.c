@@ -358,7 +358,7 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
         {
             printf("Status: Taken\n");
         }
-        else if (strcmp(lotdet[index].status, "free") == 0)
+        else
         {
             printf("Status: Free\n");
         }
