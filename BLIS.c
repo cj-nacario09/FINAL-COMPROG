@@ -6,7 +6,7 @@
 #define MAX_ENT 100
 #define Max_col 10
 #define Max_row 10
-#define MAX_STR 50
+#define MAX_STR 100
 
 typedef struct
 {
@@ -29,6 +29,7 @@ typedef struct
     int DeathMonth;
     int DeathDay;
     int DeathYear;
+    char package;
     char qoute[MAX_STR];
 } Info;
 
@@ -38,12 +39,15 @@ void MarkLot(char Lot[][Max_col], Info entry);
 void PLot(char Lot[][Max_col]);
 void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT]);
 void cMonth(int num_month, char *monthptr);
+Info Register(Info entry_again);
+char Choose_pckg();
 
 int main()
 {
     int Menu_Option;
     int LvisMenu;  // Variable for Menu
     int index = 0; // Index in the array from row and column
+    int index0;
     int Lot_index = 0;
     int again;             // Variable for the loop in Choosing Lot Info
     int row_id, column_id; // Column and Row
@@ -51,6 +55,7 @@ int main()
     Info deads[MAX_ENT]; // Arrays of Struct, 100
     Lot_Info lotdet[MAX_ENT];
     Info entry;         // For the masterlits file with taken lot
+    Info entry_again;   // For the input entry
     Lot_Info lot_entry; // For scanning the lot details
 
     char Lot[Max_row][Max_col]; // 10x10 matrix for Lot
@@ -77,9 +82,31 @@ int main()
 
     while (1)
     {
+
+        entry = Read_Entry(ifp);
+        lot_entry = Lot_details(lfp);
+
+        if (feof(ifp) && ferror(ifp) || feof(lfp) || ferror(lfp))
+            break;
+
+        if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
+        {
+            index = ((entry.row - 1) * Max_row) + entry.column;
+            deads[index] = entry;
+            MarkLot(Lot, entry);
+        }
+
+        if (lot_entry.row >= 1 && lot_entry.row <= Max_row && lot_entry.column >= 0 && lot_entry.column <= Max_col)
+        {
+            Lot_index = ((lot_entry.row - 1) * Max_row) + lot_entry.column;
+            lotdet[Lot_index] = lot_entry;
+        }
+    }
+
+    while (1)
+    {
         printf("\n\t\t\t\t\tWelcome to B.L.I.S.\n");
         printf("\t\t\t\t  Burial Lot Information System\n");
-
         printf("\n%55s\n", "Choose one of the Options below:");
         printf("%54s\n", "1. New Entry");
         printf("%56s\n", "2. Lot Visuals");
@@ -91,30 +118,46 @@ int main()
         switch (Menu_Option)
         {
         case 1:
-            break;
-        case 2: // Lot Visualization
-            while (1)
+            do
             {
 
-                entry = Read_Entry(ifp);
-                lot_entry = Lot_details(lfp);
+                // Display the Lot visuals
+                PLot(Lot);
+                printf("\nPlease choose a lot from the table above (e.g. A-1).\n");
+                printf("\nEnter Lot(Column-Row): ");
+                scanf(" %c-%d", &colid, &row_id);
+                column_id = toupper(colid) - 'A';
 
-                if (feof(ifp) && ferror(ifp) || feof(lfp) || ferror(lfp))
+                index = ((row_id - 1) * Max_row) + column_id;
+
+                if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row)
+                {
+                    printf("\nNot an option. Try Again\n");
+                }
+                if (strcmp(lotdet[index].status, "taken") == 0)
+                {
+                    printf("\nLot is already taken\n");
+                }
+                else if (strcmp(lotdet[index].status, "reserve") == 0)
+                {
+                    printf("\nLot is already reserved\n");
+                }
+                else
+                {
+                    entry_again.column = column_id;
+                    entry_again.row = row_id;
+                    entry_again.package = Choose_pckg();
+                    Register(entry_again);
+                    deads[index] = entry_again;
+                    MarkLot(Lot, deads[index]);
                     break;
-
-                if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
-                {
-                    index = ((entry.row - 1) * Max_row) + entry.column;
-                    deads[index] = entry;
-                    MarkLot(Lot, entry);
                 }
 
-                if (lot_entry.row >= 1 && lot_entry.row <= Max_row && lot_entry.column >= 0 && lot_entry.column <= Max_col)
-                {
-                    Lot_index = ((lot_entry.row - 1) * Max_row) + lot_entry.column;
-                    lotdet[Lot_index] = lot_entry;
-                }
-            }
+            } while (1);
+
+            break;
+        case 2: // Lot Visualization
+
             // Display the Lot visuals
             PLot(Lot);
             do
@@ -139,35 +182,38 @@ int main()
 
                         if (column_id < 0 || column_id > ('J' - 'A') || row_id < 0 || row_id > Max_row)
                         {
+
                             printf("Not an option. Try Again\n");
-                            break;
                         }
-
-                        Print_info(column_id, row_id, deads, lotdet);
-
-                        printf("\n%55s\n", "Choose one of the Options below:");
-                        printf("%57s\n", "1. Choose Again");
-                        printf("%54s\n", "2. Main Menu");
-                        printf("%49s\n", "3. Exit");
-                        printf("Option: ");
-                        scanf("%d", &again);
-
-                        switch (again)
+                        else
                         {
-                        case 1:
-                            PLot(Lot);
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            printf("Exiting Program...\n");
-                            fclose(ifp);
-                            fclose(ofp);
-                            exit(0);
-                        default:
-                            printf("Not an option, Try Again\n");
-                            printf("\n");
-                            break;
+
+                            Print_info(column_id, row_id, deads, lotdet);
+
+                            printf("\n%55s\n", "Choose one of the Options below:");
+                            printf("%57s\n", "1. Choose Again");
+                            printf("%54s\n", "2. Main Menu");
+                            printf("%49s\n", "3. Exit");
+                            printf("Option: ");
+                            scanf("%d", &again);
+
+                            switch (again)
+                            {
+                            case 1:
+                                PLot(Lot);
+                                break;
+                            case 2:
+                                break;
+                            case 3:
+                                printf("Exiting Program...\n");
+                                fclose(ifp);
+                                fclose(ofp);
+                                exit(0);
+                            default:
+                                printf("Not an option, Try Again\n");
+                                printf("\n");
+                                break;
+                            }
                         }
 
                     } while (again != 2);
@@ -235,6 +281,7 @@ Info Read_Entry(FILE *fileptr)
     fscanf(fileptr, "%d", &entry.DeathMonth);
     fscanf(fileptr, "%d", &entry.DeathDay);
     fscanf(fileptr, "%d", &entry.DeathYear);
+    fscanf(fileptr, " %c", &entry.package);
     fscanf(fileptr, " %[^\n]", entry.qoute);
 
     return entry;
@@ -342,7 +389,8 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
         printf("\n\nLot: %c-%d", colleter, deads[index].row);
         printf("\nName: %s", deads[index].fullname);
         printf("\nBirthday: %s/%d/%d", bmonth, deads[index].BirthDay, deads[index].BirthYear);
-        printf("\nDate of Death: %s/%d/%d\n", dmonth, deads[index].DeathDay, deads[index].DeathYear);
+        printf("\nDate of Death: %s/%d/%d", dmonth, deads[index].DeathDay, deads[index].DeathYear);
+        printf("\nPackage: %c\n", deads[index].package);
         printf("Qoute: %s\n", deads[index].qoute);
     }
     else
@@ -361,6 +409,77 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
         else
         {
             printf("Status: Free\n");
+        }
+    }
+}
+
+Info Register(Info entry_again)
+{
+    printf("\nEnter full Name: ");
+    scanf(" %[^\n]", entry_again.fullname);
+    printf("Enter Birth Month: ");
+    scanf("%d", &entry_again.BirthMonth);
+    printf("Enter Birth Day: ");
+    scanf("%d", &entry_again.BirthDay);
+    printf("Enter Birth Year: ");
+    scanf("%d", &entry_again.BirthYear);
+    printf("Enter Month of death: ");
+    scanf("%d", &entry_again.DeathMonth);
+    printf("Enter date of death: ");
+    scanf("%d", &entry_again.DeathDay);
+    printf("Enter year of death: ");
+    scanf("%d", &entry_again.DeathYear);
+    printf("Enter quote: ");
+    scanf(" %[^\n]", entry_again.qoute);
+
+    return entry_again;
+}
+
+char Choose_pckg()
+{
+    char choice;
+
+    while (1)
+    {
+        printf("\nPackage Options:\n");
+        printf("A. Normal\n");
+        printf("B. Silver\n");
+        printf("C. Premium\n");
+        printf("D. Gold\n");
+        printf("Choose a package (A/B/C/D): ");
+
+        if (scanf(" %c", &choice) == 1)
+        {
+            switch (choice)
+            {
+            case 'A':
+            case 'a':
+                printf("You have chosen the Normal package.\n");
+                printf("This package includes the burial plot itself, the opening and closing of the grave, and a grave care once every 6 months.\n");
+                return 'A'; // Exit the function after a valid choice is made
+            case 'B':
+            case 'b':
+                printf("You have chosen the Silver package.\n");
+                printf("In addition to the features of the premium package, the Silver package may include amenities like occasional floral arrangements, access to support services for the bereaved, a selection of standard markers or headstones with basic engraving options, and priority scheduling for cemetery visits or special events.\n");
+                return 'B'; // Exit the function after a valid choice is made
+            case 'C':
+            case 'c':
+                printf("You have chosen the Premium package.\n");
+                printf("This package is one level above the Normal package and offers enhanced services such as additional customization options, upgraded materials for the headstone or marker, and more frequent grave care once every 3 months.\n");
+                return 'C'; // Exit the function after a valid choice is made
+            case 'D':
+            case 'd':
+                printf("You have chosen the Gold package.\n");
+                printf("The Gold package includes all the benefits of the Silver package and offers the additional feature of a mausoleum for above-ground interment. This may include a designated space within the mausoleum, personalized inscriptions, ongoing maintenance of the structure, and exclusive access to certain areas or facilities within the cemetery grounds for private ceremonies or gatherings.\n");
+                return 'D'; // Exit the function after a valid choice is made
+            default:
+                printf("Invalid choice. Please choose from A, B, C, or D.\n");
+                break;
+            }
+        }
+        else
+        {
+            printf("\n\nFailed to read input. Please try again.\n");
         }
     }
 }
