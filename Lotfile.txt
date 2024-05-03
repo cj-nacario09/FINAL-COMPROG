@@ -8,7 +8,7 @@ A-2
 2.00
 3.50
 20000
-reserve
+Free
 
 A-3
 2.50
@@ -56,7 +56,7 @@ A-10
 2.10
 3.30
 21000
-reserve
+Free
 
 B-1
 1.90
@@ -92,13 +92,13 @@ B-6
 2.30
 3.30
 20500
-reserve
+Free
 
 B-7
 1.90
 2.90
 15500
-reserve
+Free
 
 B-8
 2.40
@@ -140,7 +140,7 @@ C-4
 2.20
 2.70
 18000
-reserve
+Free
 
 C-5
 1.70
@@ -176,7 +176,7 @@ C-10
 2.30
 3.40
 20500
-reserve
+Free
 
 D-1
 1.90
@@ -206,19 +206,19 @@ D-5
 1.60
 2.60
 14000
-reserve
+Free
 
 D-6
 2.30
 3.30
 24000
-reserve
+Free
 
 D-7
 1.90
 2.90
 16000
-reserve
+Free
 
 D-8
 2.40
@@ -242,7 +242,7 @@ E-1
 2.00
 3.20
 18000
-reserve
+Free
 
 E-2
 2.20
@@ -350,31 +350,31 @@ F-9
 1.70
 2.80
 17000
-reserve
+Free
 
 F-10
 2.20
 3.40
 24000
-reserve
+Free
 
 G-1
 2.00
 3.20
 19000
-reserve
+Free
 
 G-2
 2.20
 3.70
 24000
-reserve
+Free
 
 G-3
 2.50
 3.20
 22000
-reserve
+Free
 
 G-4
 2.20
@@ -452,7 +452,7 @@ H-6
 2.30
 3.30
 28000
-reserve
+Free
 
 H-7
 1.90
@@ -470,25 +470,24 @@ H-9
 1.70
 2.80
 18000
-reserve
+Free
 
 H-10
 2.20
 3.40
 25000
-reserve
-
+Free
 I-1
 2.00
 3.20
 21000
-reserve
+Free
 
 I-2
 2.20
 3.70
 26000
-reserve
+Free
 
 I-3
 2.50
@@ -524,7 +523,7 @@ I-8
 2.40
 3.30
 25000
-reserve
+Free
 
 I-9
 1.80
@@ -560,13 +559,13 @@ J-4
 2.10
 2.60
 23000
-reserve
+Free
 
 J-5
 1.60
 2.60
 19000
-reserve
+Free
 
 J-6
 2.30
