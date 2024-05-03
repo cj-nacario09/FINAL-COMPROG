@@ -134,23 +134,22 @@ int main()
                 {
                     printf("\nNot an option. Try Again\n");
                 }
-                if (strcmp(lotdet[index].status, "taken") == 0)
-                {
-                    printf("\nLot is already taken\n");
-                }
-                else if (strcmp(lotdet[index].status, "reserve") == 0)
-                {
-                    printf("\nLot is already reserved\n");
-                }
                 else
                 {
-                    entry_again.column = column_id;
-                    entry_again.row = row_id;
-                    entry_again.package = Choose_pckg();
-                    Register(entry_again);
-                    deads[index] = entry_again;
-                    MarkLot(Lot, deads[index]);
-                    break;
+                    if (strcmp(lotdet[index].status, "taken") == 0)
+                    {
+                        printf("\nLot is already taken\n");
+                    }
+                    else
+                    {
+                        entry_again.column = column_id;
+                        entry_again.row = row_id;
+                        entry_again.package = Choose_pckg();
+                        Register(entry_again);
+                        deads[index] = entry_again;
+                        MarkLot(Lot, deads[index]);
+                        break;
+                    }
                 }
 
             } while (1);
