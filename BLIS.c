@@ -39,6 +39,7 @@ void MarkLot(char Lot[][Max_col], Info entry);
 void PLot(char Lot[][Max_col]);
 void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT]);
 void cMonth(int num_month, char *monthptr);
+void Price_list(int row, int column, Info deads[MAX_ENT], Lot_Info  lotdet[MAX_ENT]);
 Info Register(Info entry_again);
 char Choose_pckg();
 
@@ -147,6 +148,7 @@ int main()
                         entry_again.package = Choose_pckg();
                         Register(entry_again);
                         deads[index] = entry_again;
+                        Price_list(row_id, column_id, deads, lotdet);
                         MarkLot(Lot, deads[index]);
                         break;
                     }
@@ -481,4 +483,10 @@ char Choose_pckg()
             printf("\n\nFailed to read input. Please try again.\n");
         }
     }
+}
+
+void Price_list(int row, int column, Info deads[MAX_ENT], Lot_Info  lotdet[MAX_ENT]) {
+
+ Print_info(column, row, deads, lotdet);
+
 }
