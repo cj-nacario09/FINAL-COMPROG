@@ -87,7 +87,10 @@ int main()
     ifp = fopen("MASTERLIST.in", "r+");
     lfp = fopen("Lotfile.in", "r+");
 
-    if (feof(ifp) && ferror(ifp) || feof(lfp) || ferror(lfp))
+    fseek(lfp, 0, SEEK_SET);
+    fseek(ifp, 0, SEEK_SET);
+
+    if (!ifp || !lfp)
     {
         printf("Error opening files.\n");
         return 1;
