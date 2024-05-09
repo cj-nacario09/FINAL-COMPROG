@@ -90,7 +90,7 @@ int main()
     ifp = fopen("MASTERLIST.in", "r+");
     lfp = fopen("Lotfile.in", "r+");
 
-    if (!ifp || !lfp)
+    if (feof(ifp) || ferror(ifp) || feof(lfp) || ferror(lfp))
     {
         printf("Error opening files.\n");
         return 1;
@@ -120,7 +120,7 @@ int main()
     }
     while (1)
     {
-        printf("\e[1;1H\e[2J");
+        system("cls");
         print_text();
         sleep(0.5);
         printf("\t\t\t\t\t\tBurial Lot Information System\n\n");
@@ -134,12 +134,12 @@ int main()
         switch (Menu_Option)
         {
         case 1:
-            printf("\e[1;1H\e[2J");
-            sleep(1);
+            system("cls");
+                sleep(1);
             do
             {
-                printf("\e[1;1H\e[2J");
-                sleep(0.5);
+                system("cls");
+                    sleep(0.5);
                 printf("\n\t\t\t\t    ======================>  NEW ENTRY <=========================\n");
                 // Display the Lot visuals
                 PLot(Lot);
@@ -161,13 +161,13 @@ int main()
                 }
                 else
                 {
-                    printf("\e[1;1H\e[2J");
-                    sleep(0.5);
+                    system("cls");
+                        sleep(0.5);
                     deads[index] = Register(entry_again, curr_year, column_id, row_id);
                     do
                     {
-                        printf("\e[1;1H\e[2J");
-                        sleep(0.5);
+                        system("cls");
+                            sleep(0.5);
                         printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
                         printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
                         printf("\t\t\t\t\t\t    1 => Proceed to Payment\n");
@@ -179,8 +179,8 @@ int main()
                         {
                         case 1:
                             packagePrice = getPackagePrice(deads[index].package);
-                            printf("\e[1;1H\e[2J");
-                            sleep(0.5);
+                            system("cls");
+                                sleep(0.5);
                             printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
                             printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
                             printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
@@ -213,7 +213,7 @@ int main()
                             break;
                         case 2:
                             deads[index] = empty;
-                            printf("\e[1;1H\e[2J");
+                            system("cls"); 
                             break;
                         default:
                             printf("Not an option, Try Again\n");
@@ -227,12 +227,12 @@ int main()
             } while (1);
             break;
         case 2: // Lot Visualization
-            printf("\e[1;1H\e[2J");
-            sleep(1.3);
+            system("cls");
+                sleep(1.3);
             do
             {
-                printf("\e[1;1H\e[2J");
-                PLot(Lot);
+                system("cls");
+                    PLot(Lot);
                 printf("\n\t\t\t\t    =====================> LOT VISUALS <=========================\n");
                 printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
                 printf("\t\t\t\t\t\t    1 => Lot Information\n");
@@ -246,8 +246,8 @@ int main()
                 case 1:
                     do
                     {
-                        printf("\e[1;1H\e[2J");
-                        PLot(Lot);
+                        system("cls");
+                            PLot(Lot);
                         printf("\n\t\t\t\t    =====================> LOT VISUALS <=========================\n");
                         printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
                         scanf(" %c-%d", &colid, &row_id);
@@ -295,7 +295,7 @@ int main()
                     } while (again != 2);
                     break;
                 case 2:
-                    printf("\e[1;1H\e[2J");
+                    system("cls"); 
                     break;
                 case 3:
                     printf("Exiting Program...\n");
@@ -311,24 +311,24 @@ int main()
 
                 if (again == 2)
                 {
-                    printf("\e[1;1H\e[2J");
-                    break;
+                    system("cls");
+                     break;
                 }
 
-                printf("\e[1;1H\e[2J");
+                system("cls");
             } while (LvisMenu != 2 && LvisMenu != 3);
 
             break;
 
         case 3: // Package Descriptions
-            printf("\e[1;1H\e[2J");
-            sleep(2);
+            system("cls");
+                sleep(2);
             pkg_des();
             sleep(5);
             do
             {
-                printf("\e[1;1H\e[2J");
-                sleep(1);
+                system("cls");
+                    sleep(1);
                 printf("\n\n\n\n\n\n\n\n\n\t\t\t\t    =============================================================\n\n");
                 printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
                 printf("\t\t\t\t\t\t    1 => Avail a Package\n");
@@ -339,8 +339,8 @@ int main()
                 switch (Pckg_menu)
                 {
                 case 1:
-                    printf("\e[1;1H\e[2J");
-                    sleep(1);
+                    system("cls");
+                        sleep(1);
                     PLot(Lot);
                     printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
                     scanf(" %c-%d", &colid, &row_id);
@@ -360,13 +360,13 @@ int main()
                     }
                     else
                     {
-                        printf("\e[1;1H\e[2J");
-                        sleep(0.5);
+                        system("cls");
+                            sleep(0.5);
                         deads[index] = Register(entry_again, curr_year, column_id, row_id);
                         do
                         {
-                            printf("\e[1;1H\e[2J");
-                            sleep(0.5);
+                            system("cls");
+                                sleep(0.5);
                             printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
                             printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
                             printf("\t\t\t\t\t\t    1 => Proceed to Payment\n");
@@ -378,8 +378,8 @@ int main()
                             {
                             case 1:
                                 packagePrice = getPackagePrice(deads[index].package);
-                                printf("\e[1;1H\e[2J");
-                                sleep(0.5);
+                                system("cls");
+                                    sleep(0.5);
                                 printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
                                 printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
                                 printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
@@ -412,7 +412,7 @@ int main()
                                 break;
                             case 2:
                                 deads[index] = empty;
-                                printf("\e[1;1H\e[2J");
+                                system("cls"); 
                                 break;
                             default:
                                 printf("Not an option, Try Again\n");
@@ -426,8 +426,8 @@ int main()
 
                     break;
                 case 2:
-                    printf("\e[1;1H\e[2J");
-                    sleep(2);
+                    system("cls");
+                        sleep(2);
                     break;
                 case 3:
                     Save(deads, lotdet, ifp, lfp);
@@ -572,8 +572,8 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
     colleter = 'A' + col;
 
     index = ((row - 1) * Max_row) + col;
-    printf("\e[1;1H\e[2J");
-    sleep(1);
+    system("cls");
+        sleep(1);
 
     cMonth(deads[index].BirthMonth, bmonth);
     cMonth(deads[index].DeathMonth, dmonth);
@@ -619,15 +619,15 @@ Info Register(Info entry_again, int curr_year, int column, int row)
     char col = 'A' + column;
     entry_again.column = column;
     entry_again.row = row;
-    printf("\e[1;1H\e[2J");
-    entry_again.package = Choose_pckg();
+    system("cls");
+        entry_again.package = Choose_pckg();
     sleep(1);
     char bmont[MAX_STR];
     char dmont[MAX_STR];
     do
     {
-        printf("\e[1;1H\e[2J");
-        sleep(1);
+        system("cls");
+            sleep(1);
         printf("\n\n\n\n\t\t\t\t                          LOT INFORMATION");
         printf("\n\t\t\t\t    =============================================================\n\n");
         printf("\t\t\t\t\t NAME          >>>>>>>>>>>>>>> ");
@@ -713,8 +713,8 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 
         do
         {
-            printf("\e[1;1H\e[2J");
-            sleep(1);
+            system("cls");
+                sleep(1);
             printf("\n\n\n\t\t\t\t\t\t Please confirm the details below:\n\n");
             printf("\n\t\t\t\t                          LOT INFORMATION");
             printf("\n\t\t\t\t    =============================================================\n\n");
@@ -755,8 +755,8 @@ char Choose_pckg()
     char choice;
     while (1)
     {
-        printf("\e[1;1H\e[2J");
-        sleep(1);
+        system("cls");
+            sleep(1);
         pkg_des();
         printf("\t\t\t\t    Choose a package: ");
 
@@ -766,8 +766,8 @@ char Choose_pckg()
             {
             case 'A':
             case 'a':
-                printf("\e[1;1H\e[2J");
-                sleep(1);
+                system("cls");
+                    sleep(1);
                 printf("\n\n\n\n\t\t\t\t    =======================>NORMAL PACKAGE<======================");
                 printf("\n\n\t\t\t\t\tThis package includes the burial plot itself, the\n\t\t\t\t\topening and closing of the grave and a grave care\n\t\t\t\t\tof once every 6 months.\n\n");
                 printf("\n\t\t\t\t    =============================================================\n");
@@ -775,8 +775,8 @@ char Choose_pckg()
                 return 'A'; // Exit the function after a valid choice is made
             case 'B':
             case 'b':
-                printf("\e[1;1H\e[2J");
-                sleep(1);
+                system("cls");
+                    sleep(1);
                 printf("\n\n\n\n\t\t\t\t    ========================SILVER PACKAGE=======================");
                 printf("\n\n\t\t\t\t\tThis package is one level above the Normal package.\n\t\t\t\t\tThis package offers a more enhanced service  than\n\t\t\t\t\tthe previous level such as additional customization\n\t\t\t\t\toption, upgraded materials for the headstone or marker\n\t\t\t\t\tand a more frequent grave care of once every 3 months.\n\n");
                 printf("\n\t\t\t\t    =============================================================\n");
@@ -784,8 +784,8 @@ char Choose_pckg()
                 return 'B'; // Exit the function after a valid choice is made
             case 'C':
             case 'c':
-                printf("\e[1;1H\e[2J");
-                sleep(1);
+                system("cls");
+                    sleep(1);
                 printf("\n\n\n\n\t\t\t\t    =======================PREMIUM PACKAGE=======================");
                 printf("\n\n\t\t\t\t\tIn addition to the features of the premium package,\n\t\t\t\t\tthe Silver package may include amenities like occasional\n\t\t\t\t\tfloral arrangements, access to support services for the\n\t\t\t\t\tbereaved, a selection of standard markers or headstones\n\t\t\t\t\twith basic engraving options, priority scheduling for\n\t\t\t\t\tcemetery visits or special events, ensuring ease of\n\t\t\t\t\ttaccess and convenience for family members and visitors.\n\n");
                 printf("\t\t\t\t    =============================================================\n");
@@ -793,8 +793,8 @@ char Choose_pckg()
                 return 'C'; // Exit the function after a valid choice is made
             case 'D':
             case 'd':
-                printf("\e[1;1H\e[2J");
-                sleep(1);
+                system("cls");
+                    sleep(1);
                 printf("\n\n\n\n\t\t\t\t    =========================GOLD PACKAGE========================");
                 printf("\n\n\t\t\t\t\tThe Gold package includes all the benefits of the Silver\n\t\t\t\t\tpackage and offers the additional feature of a mausoleum\n\t\t\t\t\tfor above-ground interment. This may include a designated\n\t\t\t\t\tspace within the mausoleum, personalized inscriptions,\n\t\t\t\t\tongoing maintenance of the structure and exclusive access\n\t\t\t\t\tto certain areas or facilities within the cemetery grounds\n\t\t\t\t\tfor private ceremonies or gatherings.\n\n");
                 printf("\t\t\t\t    =============================================================\n");
