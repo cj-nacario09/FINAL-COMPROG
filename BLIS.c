@@ -47,6 +47,8 @@ float getPackagePrice(char package);
 void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp);
 void print_text();
 void pkg_des();
+void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice);
+void history(Lot_Info lotdet, Info deads, float packagePrice);
 
 int main()
 {
@@ -149,7 +151,7 @@ int main()
 
                 index = ((row_id - 1) * Max_row) + column_id;
 
-                if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row)
+                if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
                 {
                     printf("\t\t\t\t    Not an option. Try again.\n\n");
                     sleep(1);
@@ -197,8 +199,15 @@ int main()
                             case 1:
                                 MarkLot(Lot, deads[index]);
                                 strcpy(lotdet[index].status, "taken");
+                                system("cls");
+                                sleep(0.5);
+                                printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
                                 PLot(Lot);
-                                printf("\t\t\t\t\t\tYou have succesfully registered...");
+                                sleep(4);
+                                print_rcpt(lotdet[index], deads[index], packagePrice);
+                                history(lotdet[index], deads[index], packagePrice);
+                                sleep(1);
+                                printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
                                 sleep(1);
                                 break;
                             case 2:
@@ -254,10 +263,11 @@ int main()
 
                         column_id = toupper(colid) - 'A';
 
-                        if (column_id < 0 || column_id > ('J' - 'A') || row_id < 0 || row_id > Max_row)
+                        if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
                         {
 
-                            printf("Not an option. Try Again\n");
+                            printf("\n\t\t\t\t    Not an option. Try again.");
+                            sleep(1.5);
                         }
                         else
                         {
@@ -396,8 +406,15 @@ int main()
                                 case 1:
                                     MarkLot(Lot, deads[index]);
                                     strcpy(lotdet[index].status, "taken");
+                                    system("cls");
+                                    sleep(0.5);
+                                    printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
                                     PLot(Lot);
-                                    printf("\t\t\t\t\t\tYou have succesfully registered...");
+                                    sleep(4);
+                                    print_rcpt(lotdet[index], deads[index], packagePrice);
+                                    history(lotdet[index], deads[index], packagePrice);
+                                    sleep(1);
+                                    printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
                                     sleep(1);
                                     break;
                                 case 2:
@@ -915,4 +932,70 @@ void pkg_des()
     printf("\t\t\t\t    D => GOLD PACKAGE [PHP 250000.00]\n");
     printf("\n\t\t\t\t\tThe Gold package includes all the benefits of the Silver\n\t\t\t\t\tpackage and offers the additional feature of a mausoleum\n\t\t\t\t\tfor above-ground interment. This may include a designated\n\t\t\t\t\tspace within the mausoleum, personalized inscriptions,\n\t\t\t\t\tongoing maintenance of the structure and exclusive access\n\t\t\t\t\tto certain areas or facilities within the cemetery grounds\n\t\t\t\t\tfor private ceremonies or gatherings.\n");
     printf("\t\t\t\t    =============================================================\n");
+}
+
+void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice)
+{
+    FILE *rfp;
+    rfp = fopen("Reciept.in", "w");
+    time_t clock = time(NULL);
+    struct tm date = *localtime(&clock);
+    char bmonth[MAX_STR], dmonth[MAX_STR];
+    char colleter = 'A' + deads.column;
+    cMonth(deads.BirthMonth, bmonth);
+    cMonth(deads.DeathMonth, dmonth);
+    system("cls");
+    sleep(1);
+
+    cMonth(deads.BirthMonth, bmonth);
+    cMonth(deads.DeathMonth, dmonth);
+    fprintf(rfp, "\n\n\t\t   =============================================================\n\n");
+    fprintf(rfp, "\t\t\t\t\t\t  _        _    _   _   _     _   _  __\n");
+    fprintf(rfp, "\t\t\t\t\t\t /_) /  / /_`  /_/ /_` / ` / /_` /_/ / \n");
+    fprintf(rfp, "\t\t\t\t\t\t/_) /_,/ ._/  / \\ /_, /_, / /_, /   /  \n");
+    fprintf(rfp, "\t\t\t\t\t                                      \n");
+    fprintf(rfp, "\n\t\t   =============================================================");
+    fprintf(rfp, "\n\t\t\t\t    %02d/%02d/%02d \t\t\t\t\t\t    %02d:%02d\n", date.tm_mon, date.tm_mon + 1, date.tm_year + 1900, date.tm_hour, date.tm_min);
+
+    fprintf(rfp, "\n\t\t\t\t\t LOT ID        >>>>>>>>>>>>>>> %c-%d\n", colleter, deads.row);
+    fprintf(rfp, "\t\t\t\t\t NAME          >>>>>>>>>>>>>>> %s\n", deads.fullname);
+    fprintf(rfp, "\t\t\t\t\t DATE OF BIRTH >>>>>>>>>>>>>>> %s /%02d/%d\n", bmonth, deads.BirthDay, deads.BirthYear);
+    fprintf(rfp, "\t\t\t\t\t DATE OF DEATH >>>>>>>>>>>>>>> %s /%02d/%d\n", dmonth, deads.DeathDay, deads.DeathYear);
+    fprintf(rfp, "\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> %c\n", deads.package);
+    fprintf(rfp, "\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads.qoute);
+    fprintf(rfp, "\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
+    fprintf(rfp, "\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet.Price);
+    fprintf(rfp, "\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet.Price);
+    fprintf(rfp, "\n\t\t    =============================================================\n\n");
+
+    fclose(rfp);
+}
+
+void history(Lot_Info lotdet, Info deads, float packagePrice)
+{
+    FILE *hfp;
+    hfp = fopen("History.in", "a");
+    time_t clock = time(NULL);
+    struct tm date = *localtime(&clock);
+    char bmonth[MAX_STR], dmonth[MAX_STR];
+    char colleter = 'A' + deads.column;
+    cMonth(deads.BirthMonth, bmonth);
+    cMonth(deads.DeathMonth, dmonth);
+
+    cMonth(deads.BirthMonth, bmonth);
+    cMonth(deads.DeathMonth, dmonth);
+    fprintf(hfp, "\t\t\t\t    %02d/%02d/%02d \t\t\t\t\t\t    %02d:%02d\n", date.tm_mon, date.tm_mon + 1, date.tm_year + 1900, date.tm_hour, date.tm_min);
+
+    fprintf(hfp, "\n\t\t\t\t\t LOT ID        >>>>>>>>>>>>>>> %c-%d\n", colleter, deads.row);
+    fprintf(hfp, "\t\t\t\t\t NAME          >>>>>>>>>>>>>>> %s\n", deads.fullname);
+    fprintf(hfp, "\t\t\t\t\t DATE OF BIRTH >>>>>>>>>>>>>>> %s /%02d/%d\n", bmonth, deads.BirthDay, deads.BirthYear);
+    fprintf(hfp, "\t\t\t\t\t DATE OF DEATH >>>>>>>>>>>>>>> %s /%02d/%d\n", dmonth, deads.DeathDay, deads.DeathYear);
+    fprintf(hfp, "\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> %c\n", deads.package);
+    fprintf(hfp, "\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads.qoute);
+    fprintf(hfp, "\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
+    fprintf(hfp, "\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet.Price);
+    fprintf(hfp, "\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet.Price);
+    fprintf(hfp, "\n\t\t    =============================================================\n");
+
+    fclose(hfp);
 }
