@@ -49,6 +49,7 @@ void print_text();
 void pkg_des();
 void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice);
 void history(Lot_Info lotdet, Info deads, float packagePrice);
+void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, Lot_Info lotdet[MAX_ENT], FILE *ifp, FILE *lfp, int curr_year);
 
 int main()
 {
@@ -130,7 +131,8 @@ int main()
         printf("\t\t\t\t\t\t    1 => New Entry\n");
         printf("\t\t\t\t\t\t    2 => Lot Visuals\n");
         printf("\t\t\t\t\t\t    3 => Package Descriptions\n");
-        printf("\t\t\t\t\t\t    4 => Exit\n\n");
+        printf("\t\t\t\t\t\t    4 => Update Info\n");
+        printf("\t\t\t\t\t\t    5 => Exit\n\n");
         printf("\t\t\t\t\t\t  Option: ");
         scanf("%d", &Menu_Option);
         switch (Menu_Option)
@@ -225,7 +227,7 @@ int main()
                             system("cls");
                             break;
                         default:
-                            printf("Not an option, Try Again\n");
+                            printf("\t\t\t\t\t\t Not an option, Try Again\n");
                             sleep(1);
                             break;
                         }
@@ -296,7 +298,7 @@ int main()
                                 fclose(lfp);
                                 exit(0);
                             default:
-                                printf("Not an option, Try Again\n");
+                                printf("\t\t\t\t\t\t Not an option, Try Again\n");
                                 printf("\n");
                                 break;
                             }
@@ -432,7 +434,7 @@ int main()
                                 system("cls");
                                 break;
                             default:
-                                printf("Not an option, Try Again\n");
+                                printf("\t\t\t\t\t\t Not an option, Try Again\n");
                                 sleep(1);
                                 break;
                             }
@@ -450,21 +452,58 @@ int main()
                     Save(deads, lotdet, ifp, lfp);
                     fclose(ifp);
                     fclose(lfp);
+                    printf("Exiting Program...\n");
                     exit(0);
                 default:
-                    printf("Not an option, Try Again\n");
+                    printf("\t\t\t\t\t\t Not an option, Try Again\n");
                     sleep(1);
                     break;
                 }
-            } while (1);
-        case 4: // Exit Program
+
+            } while (Pckg_menu != 2 && Pckg_menu != 3);
+            break;
+        case 5: // Exit Program
             printf("Exiting Program...\n");
             Save(deads, lotdet, ifp, lfp);
             fclose(ifp);
             fclose(lfp);
             exit(0);
+        case 4:
+            system("cls");
+            sleep(1);
+            do
+            {
+                system("cls");
+                sleep(0.5);
+                printf("\n\t\t\t\t    ======================>  UPDATE INFO <=======================\n");
+                // Display the Lot visuals
+                PLot(Lot);
+                printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
+                scanf(" %c-%d", &colid, &row_id);
+                column_id = toupper(colid) - 'A';
+
+                index = ((row_id - 1) * Max_row) + column_id;
+
+                if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
+                {
+                    printf("\t\t\t\t    Not an option. Try again.\n\n");
+                    sleep(1);
+                }
+                else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0)
+                {
+                    update(index, colid, row_id, deads, empty, lotdet, ifp, lfp, curr_year);
+                    break;
+                }
+                else
+                {
+                    printf("\n\t\t\t\t    Lot is Free\n");
+                    sleep(1);
+                }
+            } while (1);
+
+            break;
         default: // Loop if Not an Option
-            printf("Not an option, Try Again\n");
+            printf("\t\t\t\t\t\t Not an option, Try Again\n");
             sleep(1);
             break;
         }
@@ -998,4 +1037,253 @@ void history(Lot_Info lotdet, Info deads, float packagePrice)
     fprintf(hfp, "\n\t\t    =============================================================\n");
 
     fclose(hfp);
+}
+
+void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, Lot_Info lotdet[MAX_ENT], FILE *ifp, FILE *lfp, int curr_year)
+{
+    Info ifcancel = deads[index];
+    int option, check;
+    char name[MAX_STR];
+    int month;
+    int day;
+    int year;
+    char packg;
+    char qoute[MAX_STR];
+    char bmont[MAX_STR];
+    char dmont[MAX_STR];
+    char b2mont[MAX_STR];
+    char d2mont[MAX_STR];
+
+    cMonth(deads[index].BirthMonth, bmont);
+    cMonth(deads[index].DeathMonth, dmont);
+    do
+    {
+
+        do
+        {
+            system("cls");
+            sleep(1);
+            printf("\n\n\n\n\t\t\t\t                          INFORMATION UPDATE");
+            printf("\n\t\t\t\t    =============================================================\n\n");
+            printf("\t\t\t\t\t\tChoose what to update:\n\n");
+            printf("\t\t\t\t\t\t    1 => Name\n");
+            printf("\t\t\t\t\t\t    2 => Date of Birth\n");
+            printf("\t\t\t\t\t\t    3 => Date of Death\n");
+            printf("\t\t\t\t\t\t    4 => Qoute\n");
+            printf("\t\t\t\t\t\t    5 => Package\n");
+            printf("\t\t\t\t\t\t    6 => Clear Lot\n\n");
+            printf("\t\t\t\t\t\t  Option: ");
+            scanf("%d", &option);
+
+            switch (option)
+            {
+            case 1:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\t OLD NAME          >>>>>>>>>>>>>>> %s", deads[index].fullname);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\t NEW NAME          >>>>>>>>>>>>>>> ");
+                scanf(" %[^\n]", name);
+                strcpy(deads[index].fullname, name);
+                break;
+            case 2:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\tOLD DATE OF BIRTH >>>>>>>>>>>>>>> %s / %02d /%d\n", bmont, deads[index].BirthDay, deads[index].BirthYear);
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t NEW BIRTH MONTH   >>>>>>>>>>>>>>> ");
+                    scanf("%d", &month);
+
+                    if (month < 1 || month > 12)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>>>>>>>Invalid month. Please enter a value between 1 and 12<<<<<<<<<<<<<<<<\n");
+                        sleep(1);
+                    }
+                    else
+                    {
+                        deads[index].BirthMonth = month;
+                    }
+                } while (month < 1 || month > 12);
+
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t BIRTH DAY     >>>>>>>>>>>>>>> ");
+                    scanf("%d", &day);
+
+                    if (day < 1 || day > 31)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>>>>>>> Invalid Day. Please enter a value between 1 and 31 <<<<<<<<<<<<<<<<\n");
+                    }
+                    else
+                    {
+                        deads[index].BirthDay = day;
+                    }
+
+                } while (day < 1 || day > 31);
+
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t BIRTH YEAR    >>>>>>>>>>>>>>> ");
+                    scanf("%d", &year);
+
+                    if (year < 1800 || year > curr_year)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>Invalid Year. Please enter a value between 1800 and Current Year<<<<<<<<<\n");
+                    }
+                    else
+                    {
+                        deads[index].BirthYear = year;
+                    }
+                } while (year < 1800 || year > curr_year);
+                break;
+            case 3:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\t OLD DATE OF DEATH >>>>>>>>>>>>>>> %s / %02d /%d\n", dmont, deads[index].DeathDay, deads[index].DeathYear);
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t DEATH MONTH   >>>>>>>>>>>>>>> ");
+                    scanf("%d", &month);
+
+                    if (month < 1 || month > 12)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>>>>>>>Invalid month. Please enter a value between 1 and 12<<<<<<<<<<<<<<<<\n");
+                        sleep(1);
+                    }
+                    else
+                    {
+                        deads[index].DeathMonth = month;
+                    }
+                } while (month < 1 || month > 12);
+
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t DEATH DAY     >>>>>>>>>>>>>>> ");
+                    scanf("%d", &day);
+
+                    if (day < 1 || day > 31)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>>>>>>> Invalid Day. Please enter a value between 1 and 31 <<<<<<<<<<<<<<<<\n");
+                    }
+                    else
+                    {
+                        deads[index].DeathDay = day;
+                    }
+
+                } while (day < 1 || day > 31);
+                do
+                {
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t DEATH YEAR    >>>>>>>>>>>>>>> ");
+                    scanf("%d", &year);
+
+                    if (year < 1800 || year > curr_year)
+                    {
+                        printf("\n\t\t\t>>>>>>>>>Invalid Year. Please enter a value between 1800 and Current Year<<<<<<<<<\n");
+                    }
+                    else
+                    {
+                        deads[index].DeathYear = year;
+                    }
+
+                } while (year < 1800 || year > curr_year);
+
+                break;
+            case 4:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\t OLD QOUTE         >>>>>>>>>>>>>>> %s\n", deads[index].qoute);
+                printf("\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\n\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> ");
+                scanf(" %[^\n]", qoute);
+                strcpy(deads[index].qoute, qoute);
+                break;
+            case 5:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                printf("\t\t\t\t\t OLD PACKAGE       >>>>>>>>>>>>>>> %c\n", deads[index].package);
+                do
+                {
+
+                    printf("\n\n\t\t\t\t    =============================================================\n\n");
+                    printf("\n\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> ");
+                    scanf(" %c", &packg);
+                    if (packg < 'A' || packg > 'D')
+                    {
+                        printf("\n\t\t\t>>>>>>>>>>>>>>> Invalid Package. Please enter a value between A and D <<<<<<<<<<<<<<<<\n");
+                    }
+                    else
+                        deads[index].package = packg;
+
+                } while (packg < 'A' || packg > 'D');
+                break;
+            case 6:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t\t\t Invalid Input. Try Again\n\n");
+                sleep(2.5);
+                deads[index] = empty;
+                break;
+            default:
+                system("cls");
+                sleep(0.5);
+                printf("\n\n\n\n\t\t\t\t\t\t Invalid Input. Try Again\n\n");
+                sleep(2.5);
+                break;
+            }
+        } while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5 && option != 6);
+
+        cMonth(deads[index].BirthMonth, b2mont);
+        cMonth(deads[index].DeathMonth, d2mont);
+        do
+        {
+            system("cls");
+            sleep(1);
+            printf("\n\n\n\t\t\t\t\t\t Please confirm the details below:\n\n");
+            printf("\n\t\t\t\t                      UPDATED LOT INFORMATION");
+            printf("\n\t\t\t\t    =============================================================\n\n");
+            printf("\t\t\t\t\t LOT ID        >>>>>>>>>>>>>>> %c-%d\n", colid, deads[index].row);
+            printf("\t\t\t\t\t NAME          >>>>>>>>>>>>>>> %s\n", deads[index].fullname);
+            printf("\t\t\t\t\t DATE OF BIRTH >>>>>>>>>>>>>>> %s / %02d /%d\n", bmont, deads[index].BirthDay, deads[index].BirthYear);
+            printf("\t\t\t\t\t DATE OF DEATH >>>>>>>>>>>>>>> %s / %02d /%d\n", dmont, deads[index].DeathDay, deads[index].DeathYear);
+            printf("\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> %c\n", deads[index].package);
+            printf("\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads[index].qoute);
+            printf("\n\t\t\t\t    =============================================================\n");
+
+            printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
+            printf("\t\t\t\t\t\t    1 => Confirm\n");
+            printf("\t\t\t\t\t\t    2 => Again\n");
+            printf("\t\t\t\t\t\t    3 => Cancel\n");
+            printf("\n\t\t\t\t\t\t  Option: ");
+            scanf("%d", &check);
+            switch (check)
+            {
+            case 1:
+                Save(deads, lotdet, ifp, lfp);
+                break;
+            case 2:
+                break;
+            case 3:
+                deads[index] = ifcancel;
+                return;
+            default:
+                printf("\n\t\t\t\t\t\t Invalid Input. Try Again\n\n");
+                break;
+            }
+            if (check == 2)
+                break;
+
+        } while (check != 1);
+    } while (1);
 }
