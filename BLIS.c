@@ -1065,6 +1065,13 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             sleep(1);
             printf("\n\n\n\n\t\t\t\t                          INFORMATION UPDATE");
             printf("\n\t\t\t\t    =============================================================\n\n");
+            printf("\t\t\t\t\t LOT ID        >>>>>>>>>>>>>>> %c-%d\n", colid, deads[index].row);
+            printf("\t\t\t\t\t NAME          >>>>>>>>>>>>>>> %s\n", deads[index].fullname);
+            printf("\t\t\t\t\t DATE OF BIRTH >>>>>>>>>>>>>>> %s / %02d /%d\n", bmont, deads[index].BirthDay, deads[index].BirthYear);
+            printf("\t\t\t\t\t DATE OF DEATH >>>>>>>>>>>>>>> %s / %02d /%d\n", dmont, deads[index].DeathDay, deads[index].DeathYear);
+            printf("\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> %c\n", deads[index].package);
+            printf("\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads[index].qoute);
+            printf("\n\t\t\t\t    =============================================================\n");
             printf("\t\t\t\t\t\tChoose what to update:\n\n");
             printf("\t\t\t\t\t\t    1 => Name\n");
             printf("\t\t\t\t\t\t    2 => Date of Birth\n");
@@ -1271,6 +1278,7 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             {
             case 1:
                 Save(deads, lotdet, ifp, lfp);
+                return;
                 break;
             case 2:
                 break;
