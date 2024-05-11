@@ -5,57 +5,61 @@
 #include <time.h>
 #include <unistd.h>
 
-#define MAX_ENT 100
-#define Max_col 10
-#define Max_row 10
-#define MAX_STR 100
+#define MAX_ENT 100 // Maximum number of entries.
+#define Max_col 10  // Maximum number of columns for lots.
+#define Max_row 10  // Maximum number of rows for lots.
+#define MAX_STR 100 // Maximum length of strings.
 
+// Struct for information about a burial lot.
 typedef struct
 {
-    int column;
-    int row;
-    float size1;
-    float size2;
-    int Price;
-    char status[MAX_STR];
+    int column;           // Column number of the lot.
+    int row;              // Row number of the lot.
+    float size1;          // Size parameter 1 of the lot.
+    float size2;          // Size parameter 2 of the lot.
+    int Price;            // Price of the lot.
+    char status[MAX_STR]; // Provides status of the lot.
 } Lot_Info;
 
+// Struct for information about a burial entry.
 typedef struct
 {
-    int column;
-    int row;
-    char fullname[MAX_STR];
-    int BirthMonth;
-    int BirthDay;
-    int BirthYear;
-    int DeathMonth;
-    int DeathDay;
-    int DeathYear;
-    char package;
-    char qoute[MAX_STR];
+    int column;             // Column number of the entry.
+    int row;                // Row number of the entry.
+    char fullname[MAX_STR]; // Full name of the deceased.
+    int BirthMonth;         // Birth month of the deceased.
+    int BirthDay;           // Birth day of the deceased.
+    int BirthYear;          // Birth year of the deceased.
+    int DeathMonth;         // Death month of the deceased.
+    int DeathDay;           // Death day of the deceased.
+    int DeathYear;          // Death year of the deceased.
+    char package;           // Chosen package for the burial.
+    char qoute[MAX_STR];    // Quotation for the burial.
 } Info;
 
-Info Read_Entry(FILE *fileptr);
-Lot_Info Lot_details(FILE *lotptr);
-void MarkLot(char Lot[][Max_col], Info entry);
-void PLot(char Lot[][Max_col]);
+// Function prototypes.
+Info Read_Entry(FILE *fileptr);                // Function to read entry from file.
+Lot_Info Lot_details(FILE *lotptr);            // Function to read lot details from file.
+void MarkLot(char Lot[][Max_col], Info entry); // Function to mark a lot as taken.
+void PLot(char Lot[][Max_col]);                // Function to display lot visuals.
 void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT]);
-void cMonth(int num_month, char *monthptr);
-Info Register(Info entry_again, int curr_year, int column, int row);
-char Choose_pckg();
-float getPackagePrice(char package);
-void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp);
-void print_text();
-void pkg_des();
-void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice);
-void history(Lot_Info lotdet, Info deads, float packagePrice);
-void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, Lot_Info lotdet[MAX_ENT], FILE *ifp, FILE *lfp, int curr_year);
+// Function to print information about a specific burial lot.
+void cMonth(int num_month, char *monthptr);                                                                                                     // Function to convert month number to month name.
+Info Register(Info entry_again, int curr_year, int column, int row);                                                                            // Function to register a new entry.
+char Choose_pckg();                                                                                                                             // Function to choose a package.
+float getPackagePrice(char package);                                                                                                            // Function to get the price of a package.
+void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp);                                                                     // Function to save data to files.
+void print_text();                                                                                                                              // Function to print introductory text.
+void pkg_des();                                                                                                                                 // Function to display package descriptions
+void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice);                                                                               // Function to print a receipt for a burial transaction.
+void history(Lot_Info lotdet, Info deads, float packagePrice);                                                                                  // Function to display the history of burial transactions.
+void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, Lot_Info lotdet[MAX_ENT], FILE *ifp, FILE *lfp, int curr_year); // Function to update information for a burial entry.
 
 int main()
 {
-    int Menu_Option;
-    int LvisMenu; // Variable for Menu
-    int Pckg_menu;
+    int Menu_Option; // Variable to store the main menu option
+    int LvisMenu;    // Variable for Menu
+    int Pckg_menu;   // Variable to store the package menu option
     int Pay_menu;
     int confirm_menu;
     int index = 0; // Index in the array from row and column
@@ -65,12 +69,12 @@ int main()
     float packagePrice;
     int curr_year;
 
-    Info deads[MAX_ENT]; // Arrays of Struct, 100
-    Lot_Info lotdet[MAX_ENT];
-    Info entry;         // For the masterlits file with taken lot
-    Info entry_again;   // For the input entry
-    Lot_Info lot_entry; // For scanning the lot details
-    static const Info empty;
+    Info deads[MAX_ENT];      // Arrays of Struct, 100 & array of burial entries
+    Lot_Info lotdet[MAX_ENT]; // Array of lot details
+    Info entry;               // For the masterlits file with taken lot
+    Info entry_again;         // For the input entry
+    Lot_Info lot_entry;       // For scanning the lot details
+    static const Info empty;  // Empty struct instance
 
     char Lot[Max_row][Max_col]; // 10x10 matrix for Lot
     char colid;                 // Char Version of Column
@@ -87,45 +91,51 @@ int main()
     FILE *ifp; // File pointer for input
     FILE *lfp; // File pointer for lot input file
 
+    // Open input files for reading and writing
     ifp = fopen("MASTERLIST.in", "r+");
     lfp = fopen("Lotfile.in", "r+");
 
+    // Move file pointers to the beginning
     fseek(lfp, 0, SEEK_SET);
     fseek(ifp, 0, SEEK_SET);
 
+    // Check if files were opened successfully
     if (!ifp || !lfp)
     {
         printf("Error opening files.\n");
         return 1;
     }
 
+    // Read entries from input files until end of file
     while (1)
     {
-
         entry = Read_Entry(ifp);
         lot_entry = Lot_details(lfp);
 
         if (feof(ifp) && ferror(ifp) || feof(lfp) || ferror(lfp))
             break;
 
+        // Check if entry is within valid range and update arrays
         if (entry.row >= 1 && entry.row <= Max_row && entry.column >= 0 && entry.column <= Max_col)
         {
             index = ((entry.row - 1) * Max_row) + entry.column;
             deads[index] = entry;
             MarkLot(Lot, entry);
         }
-
+        // Check if lot details are within valid range and update array
         if (lot_entry.row >= 1 && lot_entry.row <= Max_row && lot_entry.column >= 0 && lot_entry.column <= Max_col)
         {
             Lot_index = ((lot_entry.row - 1) * Max_row) + lot_entry.column;
             lotdet[Lot_index] = lot_entry;
         }
     }
+
+    // Main menu loop
     while (1)
     {
-        system("cls");
-        print_text();
-        sleep(0.5);
+        system("cls"); // to clear the screen for better user experience.
+        print_text();  // Print additional text (if any)
+        sleep(0.5);    // function to introduce delays for better readability and pacing.
         printf("\t\t\t\t\t\tBurial Lot Information System\n\n");
         printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
         printf("\t\t\t\t\t\t    1 => New Entry\n");
@@ -137,9 +147,9 @@ int main()
         scanf("%d", &Menu_Option);
         switch (Menu_Option)
         {
-        case 1:
-            system("cls");
-            sleep(1);
+        case 1:            // New entry
+            system("cls"); // Clear the screen
+            sleep(1);      // Introduce a delay for better user experience
             do
             {
                 system("cls");
@@ -148,12 +158,13 @@ int main()
                 // Display the Lot visuals
                 PLot(Lot);
                 printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
-                scanf(" %c-%d", &colid, &row_id);
-                column_id = toupper(colid) - 'A';
+                scanf(" %c-%d", &colid, &row_id); // Get user input for lot ID
+                column_id = toupper(colid) - 'A'; // Convert column ID to uppercase
 
-                index = ((row_id - 1) * Max_row) + column_id;
+                index = ((row_id - 1) * Max_row) + column_id; // Calculate index
 
-                if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
+                // Check if the selected lot is valid
+                if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row)
                 {
                     printf("\t\t\t\t    Not an option. Try again.\n\n");
                     sleep(1);
@@ -167,7 +178,7 @@ int main()
                 {
                     system("cls");
                     sleep(0.5);
-                    deads[index] = Register(entry_again, curr_year, column_id, row_id);
+                    deads[index] = Register(entry_again, curr_year, column_id, row_id); // Register a new entry
                     do
                     {
                         system("cls");
@@ -177,12 +188,12 @@ int main()
                         printf("\t\t\t\t\t\t    1 => Proceed to Payment\n");
                         printf("\t\t\t\t\t\t    2 => Cancel\n");
                         printf("\n\t\t\t\t\t\t  Option: ");
-                        scanf("%d", &Pay_menu);
+                        scanf("%d", &Pay_menu); // Get user input for payment menu
 
                         switch (Pay_menu)
                         {
-                        case 1:
-                            packagePrice = getPackagePrice(deads[index].package);
+                        case 1:                                                   // Proceed to payment
+                            packagePrice = getPackagePrice(deads[index].package); // Shows the price of each package
                             system("cls");
                             sleep(0.5);
                             printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
@@ -198,22 +209,22 @@ int main()
 
                             switch (confirm_menu)
                             {
-                            case 1:
-                                MarkLot(Lot, deads[index]);
-                                strcpy(lotdet[index].status, "taken");
+                            case 1:                                    // Confirm
+                                MarkLot(Lot, deads[index]);            // mark the lot
+                                strcpy(lotdet[index].status, "taken"); // change the status of lot into taken
                                 system("cls");
                                 sleep(0.5);
                                 printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
                                 PLot(Lot);
                                 sleep(4);
-                                print_rcpt(lotdet[index], deads[index], packagePrice);
-                                history(lotdet[index], deads[index], packagePrice);
+                                print_rcpt(lotdet[index], deads[index], packagePrice); // print the receipt
+                                history(lotdet[index], deads[index], packagePrice);    // add to history
                                 sleep(1);
                                 printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
                                 sleep(1);
                                 break;
-                            case 2:
-                                deads[index] = empty;
+                            case 2:                   // Cancel
+                                deads[index] = empty; // cancel
                                 break;
                             default:
                                 printf("\t\t\t\t\t\t Not an option, Try Again\n");
@@ -223,11 +234,11 @@ int main()
                             }
                             break;
                         case 2:
-                            deads[index] = empty;
+                            deads[index] = empty; // Resets entry
                             system("cls");
                             break;
                         default:
-                            printf("\t\t\t\t\t\t Not an option, Try Again\n");
+                            printf("Not an option, Try Again\n");
                             sleep(1);
                             break;
                         }
@@ -243,7 +254,7 @@ int main()
             do
             {
                 system("cls");
-                PLot(Lot);
+                PLot(Lot); // Print lot visuals
                 printf("\n\t\t\t\t    =====================> LOT VISUALS <=========================\n");
                 printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
                 printf("\t\t\t\t\t\t    1 => Lot Information\n");
@@ -251,7 +262,7 @@ int main()
                 printf("\t\t\t\t\t\t    3 => Exit\n\n");
                 printf("\t\t\t\t\t\t  Option: ");
                 scanf("%d", &LvisMenu);
-
+                // Get user input for lot visualization menu
                 switch (LvisMenu)
                 {
                 case 1:
@@ -262,10 +273,11 @@ int main()
                         printf("\n\t\t\t\t    =====================> LOT VISUALS <=========================\n");
                         printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
                         scanf(" %c-%d", &colid, &row_id);
-
+                        // Get user input for lot ID
                         column_id = toupper(colid) - 'A';
+                        // Convert column ID to uppercase
 
-                        if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
+                        if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row) // invalid input
                         {
 
                             printf("\n\t\t\t\t    Not an option. Try again.");
@@ -273,35 +285,43 @@ int main()
                         }
                         else
                         {
-
-                            Print_info(column_id, row_id, deads, lotdet);
-
-                            printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
-                            printf("\t\t\t\t\t\t    1 => Choose Again\n");
-                            printf("\t\t\t\t\t\t    2 => Main Menu\n");
-                            printf("\t\t\t\t\t\t    3 => Exit\n\n");
-                            printf("\t\t\t\t\t\t  Option: ");
-
-                            scanf("%d", &again);
-
-                            switch (again)
+                            system("cls");
+                            do
                             {
-                            case 1:
-                                sleep(1);
-                                break;
-                            case 2:
-                                break;
-                            case 3:
-                                printf("Exiting Program...\n");
-                                Save(deads, lotdet, ifp, lfp);
-                                fclose(ifp);
-                                fclose(lfp);
-                                exit(0);
-                            default:
-                                printf("\t\t\t\t\t\t Not an option, Try Again\n");
-                                printf("\n");
-                                break;
-                            }
+                                Print_info(column_id, row_id, deads, lotdet);
+                                printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
+                                printf("\t\t\t\t\t\t    1 => Choose Again\n");
+                                printf("\t\t\t\t\t\t    2 => Main Menu\n");
+                                printf("\t\t\t\t\t\t    3 => Exit\n\n");
+                                printf("\t\t\t\t\t\t  Option: ");
+
+                                scanf("%d", &again);
+                                // Get user input for next action
+                                switch (again)
+                                {
+                                case 1:
+                                    sleep(1);
+                                    break;
+                                case 2:
+                                    break;
+                                case 3:
+                                    printf("Exiting Program...\n");
+                                    Save(deads, lotdet, ifp, lfp); // Save data
+                                    fclose(ifp);                   // Close file pointer
+                                    fclose(lfp);                   // Close file pointer
+                                    exit(0);                       // Exit program
+                                default:
+                                    printf("\t\t\t\t\t\t Not an option, Try Again\n");
+                                    sleep(1.5);
+                                    printf("\n");
+                                    break;
+                                }
+                                if (again == 2)
+                                {
+                                    break;
+                                }
+
+                            } while (again != 2 && again != 1);
                         }
 
                     } while (again != 2);
@@ -350,27 +370,28 @@ int main()
                 scanf("%d", &Pckg_menu);
                 switch (Pckg_menu)
                 {
-                case 1:
+                case 1: // Avail a package
                     system("cls");
                     sleep(1);
                     PLot(Lot);
                     printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
                     scanf(" %c-%d", &colid, &row_id);
+                    // get user input for lot ID
                     column_id = toupper(colid) - 'A';
-
+                    // get column id from int to char
                     index = ((row_id - 1) * Max_row) + column_id;
 
-                    if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row)
+                    if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row) // invalid input
                     {
                         printf("\t\t\t\t    Not an option. Try again.\n\n");
                         sleep(1);
                     }
-                    else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0)
+                    else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0) // if lot is taken
                     {
                         printf("\n\t\t\t\t    Lot is already taken\n");
                         sleep(1);
                     }
-                    else
+                    else // else means available
                     {
                         system("cls");
                         sleep(0.5);
@@ -390,44 +411,49 @@ int main()
                             {
                             case 1:
                                 packagePrice = getPackagePrice(deads[index].package);
-                                system("cls");
-                                sleep(0.5);
-                                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
-                                printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
-                                printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
-                                printf("\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet[index].Price);
-                                printf("\n\t\t\t\t    =============================================================\n\n");
-
-                                printf("\t\t\t\t\t\t    1 => Confirm\n");
-                                printf("\t\t\t\t\t\t    2 => Cancel\n");
-                                printf("\n\t\t\t\t\t\t   Option: ");
-                                scanf("%d", &confirm_menu);
-
-                                switch (confirm_menu)
+                                do
                                 {
-                                case 1:
-                                    MarkLot(Lot, deads[index]);
-                                    strcpy(lotdet[index].status, "taken");
                                     system("cls");
                                     sleep(0.5);
-                                    printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
-                                    PLot(Lot);
-                                    sleep(4);
-                                    print_rcpt(lotdet[index], deads[index], packagePrice);
-                                    history(lotdet[index], deads[index], packagePrice);
-                                    sleep(1);
-                                    printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
-                                    sleep(1);
-                                    break;
-                                case 2:
-                                    deads[index] = empty;
-                                    break;
-                                default:
-                                    printf("\t\t\t\t\t\t Not an option, Try Again\n");
-                                    sleep(1);
-                                    printf("\n");
-                                    break;
-                                }
+                                    // Display payment details
+                                    printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                                    printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
+                                    printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
+                                    printf("\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet[index].Price);
+                                    printf("\n\t\t\t\t    =============================================================\n\n");
+
+                                    printf("\t\t\t\t\t\t    1 => Confirm\n");
+                                    printf("\t\t\t\t\t\t    2 => Cancel\n");
+                                    printf("\n\t\t\t\t\t\t   Option: ");
+                                    scanf("%d", &confirm_menu);
+
+                                    switch (confirm_menu)
+                                    {
+                                    case 1: // confirm payment
+                                        MarkLot(Lot, deads[index]);
+                                        strcpy(lotdet[index].status, "taken");
+                                        system("cls");
+                                        sleep(0.5);
+                                        printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
+                                        PLot(Lot);
+                                        sleep(4);
+                                        print_rcpt(lotdet[index], deads[index], packagePrice);
+                                        history(lotdet[index], deads[index], packagePrice);
+                                        sleep(1);
+                                        printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
+                                        sleep(1);
+                                        break;
+                                    case 2: // cancel payment
+                                        deads[index] = empty;
+                                        break;
+                                    default:
+                                        printf("\t\t\t\t\t\t Not an option, Try Again\n");
+                                        sleep(1);
+                                        printf("\n");
+                                        break;
+                                    }
+
+                                } while (confirm_menu != 1 && confirm_menu != 2);
                                 break;
                             case 2:
                                 deads[index] = empty;
@@ -440,15 +466,15 @@ int main()
                             }
 
                         } while (Pay_menu != 2 && Pay_menu != 1 && Pay_menu != 3);
-                        break;
+                        // Loop until valid payment option is chosen
                     }
 
                     break;
-                case 2:
+                case 2: // Main menu
                     system("cls");
                     sleep(2);
                     break;
-                case 3:
+                case 3: // exit program
                     Save(deads, lotdet, ifp, lfp);
                     fclose(ifp);
                     fclose(lfp);
@@ -459,8 +485,7 @@ int main()
                     sleep(1);
                     break;
                 }
-
-            } while (Pckg_menu != 2 && Pckg_menu != 3);
+            } while (Pckg_menu != 1 && Pckg_menu != 2);
             break;
         case 5: // Exit Program
             printf("Exiting Program...\n");
@@ -468,7 +493,7 @@ int main()
             fclose(ifp);
             fclose(lfp);
             exit(0);
-        case 4:
+        case 4: //
             system("cls");
             sleep(1);
             do
@@ -478,23 +503,24 @@ int main()
                 printf("\n\t\t\t\t    ======================>  UPDATE INFO <=======================\n");
                 // Display the Lot visuals
                 PLot(Lot);
+                // prompt user for Lot ID input
                 printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
                 scanf(" %c-%d", &colid, &row_id);
                 column_id = toupper(colid) - 'A';
-
+                // calculate the index of the corresponding input
                 index = ((row_id - 1) * Max_row) + column_id;
 
-                if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row)
+                if (column_id < 0 || column_id > Max_col || row_id < 1 || row_id > Max_row) // Invalid or out of range input
                 {
                     printf("\t\t\t\t    Not an option. Try again.\n\n");
                     sleep(1);
                 }
-                else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0)
+                else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0) // if valid update info
                 {
                     update(index, colid, row_id, deads, empty, lotdet, ifp, lfp, curr_year);
                     break;
                 }
-                else
+                else // else mea slot is free
                 {
                     printf("\n\t\t\t\t    Lot is Free\n");
                     sleep(1);
@@ -516,46 +542,46 @@ int main()
     return 0;
 }
 
+// Function to read entry details from file
 Info Read_Entry(FILE *fileptr)
 {
-    Info entry;
+    Info entry; // Declare Info struct variable
     char coletter;
     // Read lot coordinates
     fscanf(fileptr, " %c-%d", &coletter, &entry.row);
-    entry.column = toupper(coletter) - 'A';
-    fscanf(fileptr, " %[^\n]", entry.fullname);
-    fscanf(fileptr, "%d", &entry.BirthMonth);
-    fscanf(fileptr, "%d", &entry.BirthDay);
-    fscanf(fileptr, "%d", &entry.BirthYear);
-    fscanf(fileptr, "%d", &entry.DeathMonth);
-    fscanf(fileptr, "%d", &entry.DeathDay);
-    fscanf(fileptr, "%d", &entry.DeathYear);
-    fscanf(fileptr, " %c", &entry.package);
-    fscanf(fileptr, " %[^\n]", entry.qoute);
+    entry.column = toupper(coletter) - 'A';     // Convert column letter to uppercase and calculate column index
+    fscanf(fileptr, " %[^\n]", entry.fullname); // Read full name
+    fscanf(fileptr, "%d", &entry.BirthMonth);   // Read birth month
+    fscanf(fileptr, "%d", &entry.BirthDay);     // Read birth day
+    fscanf(fileptr, "%d", &entry.BirthYear);    // Read birth year
+    fscanf(fileptr, "%d", &entry.DeathMonth);   // Read death month
+    fscanf(fileptr, "%d", &entry.DeathDay);     // Read death day
+    fscanf(fileptr, "%d", &entry.DeathYear);    // Read death year
+    fscanf(fileptr, " %c", &entry.package);     // Read package
+    fscanf(fileptr, " %[^\n]", entry.qoute);    // Read quote
 
-    return entry;
+    return entry; // Return entry details
 }
-
 Lot_Info Lot_details(FILE *lotptr)
 {
-    Lot_Info loentr;
+    Lot_Info loentr; // Declare Lot_Info struct variable
     char lettercol;
 
-    fscanf(lotptr, " %c-%d", &lettercol, &loentr.row);
-    loentr.column = toupper(lettercol) - 'A';
-    fscanf(lotptr, "%f", &loentr.size1);
-    fscanf(lotptr, "%f", &loentr.size2);
-    fscanf(lotptr, "%d", &loentr.Price);
-    fscanf(lotptr, " %[^\n]", loentr.status);
+    fscanf(lotptr, " %c-%d", &lettercol, &loentr.row); // Read lot coordinates
+    loentr.column = toupper(lettercol) - 'A';          // Convert column letter to uppercase and calculate column index
+    fscanf(lotptr, "%f", &loentr.size1);               // Read size 1
+    fscanf(lotptr, "%f", &loentr.size2);               // Read size 2
+    fscanf(lotptr, "%d", &loentr.Price);               // Read price
+    fscanf(lotptr, " %[^\n]", loentr.status);          // Read status
 
-    return loentr;
+    return loentr; // Return lot details
 }
 
 void MarkLot(char Lot[][Max_col], Info entry)
 {
     Lot[entry.row - 1][entry.column] = 'X'; // Mark the lot based on 1-based indexing
 }
-
+// Function to display available lots
 void PLot(char Lot[][Max_col])
 {
     printf("\n\n\t\t\t\t       A     B     C     D     E     F     G     H     I     J\n\n");
@@ -571,7 +597,7 @@ void PLot(char Lot[][Max_col])
     }
 }
 
-void cMonth(int num_month, char *monthptr)
+void cMonth(int num_month, char *monthptr) // input number based on months of the year
 {
 
     switch (num_month)
@@ -625,15 +651,18 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
     char dmonth[MAX_STR];
     char stats[MAX_STR];
 
+    // Convert column index to corresponding letter
     colleter = 'A' + col;
 
+    // Calculate index in the array based on row and column
     index = ((row - 1) * Max_row) + col;
     system("cls");
     sleep(1);
-
+    // Convert birth month and death month integers to strings
     cMonth(deads[index].BirthMonth, bmonth);
     cMonth(deads[index].DeathMonth, dmonth);
 
+    // Check if lot is taken or free and assign status accordingly
     if (strcmp(lotdet[index].status, "taken") == 0)
     {
         strcpy(stats, "Taken");
@@ -644,7 +673,7 @@ void Print_info(int col, int row, Info deads[MAX_ENT], Lot_Info lotdet[MAX_ENT])
     }
 
     printf("\n\n\n\n\n\n\n");
-
+    // Display lot information based on whether it's taken or not
     if (strcmp(deads[index].fullname, "") != 0 && strcmp(lotdet[index].status, "taken") == 0)
     {
         printf("\n\t\t\t\t                          LOT INFORMATION");
@@ -673,11 +702,11 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 {
     int check;
     char col = 'A' + column;
-    entry_again.column = column;
-    entry_again.row = row;
-    system("cls");
-    entry_again.package = Choose_pckg();
-    sleep(1);
+    entry_again.column = column;         // Set column value for the entry
+    entry_again.row = row;               // Set row value for the entry
+    system("cls");                       // Clear screen
+    entry_again.package = Choose_pckg(); // Get the chosen package for the entry
+    sleep(1);                            // Wait for 1 second
     char bmont[MAX_STR];
     char dmont[MAX_STR];
     do
@@ -689,6 +718,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
         printf("\t\t\t\t\t NAME          >>>>>>>>>>>>>>> ");
         scanf(" %[^\n]", entry_again.fullname);
 
+        // Get user input for birth month, day, and year
         do
         {
             printf("\n\t\t\t\t\t BIRTH MONTH   >>>>>>>>>>>>>>> ");
@@ -702,6 +732,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 
         } while (entry_again.BirthMonth < 1 || entry_again.BirthMonth > 12);
 
+        // Repeat for birth day
         do
         {
             printf("\n\t\t\t\t\t BIRTH DAY     >>>>>>>>>>>>>>> ");
@@ -714,6 +745,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 
         } while (entry_again.BirthDay < 1 || entry_again.BirthDay > 31);
 
+        // Repeat for birth year
         do
         {
             printf("\n\t\t\t\t\t BIRTH YEAR    >>>>>>>>>>>>>>> ");
@@ -726,6 +758,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 
         } while (entry_again.BirthYear < 1800 || entry_again.BirthYear > curr_year);
 
+        // Repeat for death month
         do
         {
             printf("\n\t\t\t\t\t DEATH MONTH   >>>>>>>>>>>>>>> ");
@@ -737,6 +770,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
             }
         } while (entry_again.DeathMonth < 1 || entry_again.DeathMonth > 12);
 
+        // Repeat for death day
         do
         {
             printf("\n\t\t\t\t\t DEATH DAY     >>>>>>>>>>>>>>> ");
@@ -749,6 +783,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
 
         } while (entry_again.DeathDay < 1 || entry_again.DeathDay > 31);
 
+        // repeat for death year
         do
         {
             printf("\n\t\t\t\t\t DEATH YEAR    >>>>>>>>>>>>>>> ");
@@ -767,6 +802,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
         cMonth(entry_again.BirthMonth, bmont);
         cMonth(entry_again.DeathMonth, dmont);
 
+        // loop for confirming or editing details
         do
         {
             system("cls");
@@ -787,6 +823,7 @@ Info Register(Info entry_again, int curr_year, int column, int row)
             printf("\t\t\t\t\t\t    2 => Edit\n");
             printf("\n\t\t\t\t\t\t  Option: ");
             scanf("%d", &check);
+            // Handle user's choice
             switch (check)
             {
             case 1:
@@ -802,9 +839,9 @@ Info Register(Info entry_again, int curr_year, int column, int row)
             if (check == 2)
                 break;
 
-        } while (check != 1);
+        } while (check != 1); // Continue loop until confirmation
 
-    } while (check == 2);
+    } while (check == 2); // Continue loop if user chooses to edit
 }
 char Choose_pckg()
 {
@@ -869,6 +906,7 @@ char Choose_pckg()
     }
 }
 
+// get price of eacg package
 float getPackagePrice(char package)
 {
     float price = 0.0;
@@ -896,7 +934,7 @@ float getPackagePrice(char package)
     }
 }
 
-void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp)
+void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp) // saves the data stored in the arrays of structures "
 {
     if (tp == NULL || lp == NULL)
     {
@@ -905,12 +943,12 @@ void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp)
     }
     else
     {
-        fseek(tp, 0, SEEK_SET);
-        for (int i = 0; i < MAX_ENT; i++)
+        fseek(tp, 0, SEEK_SET);           // Set file pointers to the beginning of the files
+        for (int i = 0; i < MAX_ENT; i++) // Loop through entries in the holder array
         {
-            if (strcmp(holder[i].fullname, "") != 0)
+            if (strcmp(holder[i].fullname, "") != 0) // Check if the entry is not empty
             {
-                char colmn = 'A' + holder[i].column;
+                char colmn = 'A' + holder[i].column; // Convert column index to letter representation
                 fprintf(tp, "%c-%d\n", colmn, holder[i].row);
                 fprintf(tp, "%s\n", holder[i].fullname);
                 fprintf(tp, "%d\n", holder[i].BirthMonth);
@@ -924,10 +962,13 @@ void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp)
             }
         }
 
+        // Set file pointer to the beginning of the lot information file
         fseek(lp, 0, SEEK_SET);
+        // Loop through entries in the lot array
         for (int j = 0; j < MAX_ENT; j++)
         {
             char lcol = 'A' + lot[j].column;
+            // Write lot details to the text file
             fprintf(lp, "%c-%d\n", lcol, lot[j].row);
             fprintf(lp, "%.2f\n", lot[j].size1);
             fprintf(lp, "%.2f\n", lot[j].size2);
@@ -937,6 +978,7 @@ void Save(Info holder[MAX_ENT], Lot_Info lot[MAX_ENT], FILE *tp, FILE *lp)
     }
 }
 
+// Welcome to BLIS ASCII ART
 void print_text()
 {
     printf("\n\n\n");
@@ -954,7 +996,7 @@ void print_text()
     printf("\t\t\t\t\t\t      |___/|____||___||___/\n\n");
     printf("\t\t\t\t================================================================\n");
 }
-
+// a description of the packages
 void pkg_des()
 {
     printf("\n\t\t\t\t    =====================PACKAGE DESCRIPTIONS====================");
@@ -973,21 +1015,27 @@ void pkg_des()
     printf("\t\t\t\t    =============================================================\n");
 }
 
+// A function that writes receipts
 void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice)
 {
+    // open a file pointer
     FILE *rfp;
-    rfp = fopen("Reciept.in", "w");
+    // using the file pointer open a file for wrting
+    rfp = fopen("Reciept.in", "wt");
+    // geting the current time
     time_t clock = time(NULL);
     struct tm date = *localtime(&clock);
     char bmonth[MAX_STR], dmonth[MAX_STR];
+    // Since the .column member is int, change it into char
     char colleter = 'A' + deads.column;
-    cMonth(deads.BirthMonth, bmonth);
-    cMonth(deads.DeathMonth, dmonth);
+
     system("cls");
     sleep(1);
-
+    // get corresponding month to word e.g. 1 = January
     cMonth(deads.BirthMonth, bmonth);
     cMonth(deads.DeathMonth, dmonth);
+
+    // print the reciept
     fprintf(rfp, "\n\n\t\t   =============================================================\n\n");
     fprintf(rfp, "\t\t\t\t\t\t  _        _    _   _   _     _   _  __\n");
     fprintf(rfp, "\t\t\t\t\t\t /_) /  / /_`  /_/ /_` / ` / /_` /_/ / \n");
@@ -1012,6 +1060,7 @@ void print_rcpt(Lot_Info lotdet, Info deads, float packagePrice)
 
 void history(Lot_Info lotdet, Info deads, float packagePrice)
 {
+    // A function just like print-rcpt but instead of write it appends
     FILE *hfp;
     hfp = fopen("History.in", "a");
     time_t clock = time(NULL);
@@ -1041,7 +1090,7 @@ void history(Lot_Info lotdet, Info deads, float packagePrice)
 
 void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, Lot_Info lotdet[MAX_ENT], FILE *ifp, FILE *lfp, int curr_year)
 {
-    Info ifcancel = deads[index];
+    Info ifcancel = deads[index]; // have a copy of the struct data
     int option, check;
     char name[MAX_STR];
     int month;
@@ -1054,6 +1103,7 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
     char b2mont[MAX_STR];
     char d2mont[MAX_STR];
 
+    // int to words of month 1 = january
     cMonth(deads[index].BirthMonth, bmont);
     cMonth(deads[index].DeathMonth, dmont);
     do
@@ -1063,6 +1113,7 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
         {
             system("cls");
             sleep(1);
+            // print current info
             printf("\n\n\n\n\t\t\t\t                          INFORMATION UPDATE");
             printf("\n\t\t\t\t    =============================================================\n\n");
             printf("\t\t\t\t\t LOT ID        >>>>>>>>>>>>>>> %c-%d\n", colid, deads[index].row);
@@ -1072,6 +1123,7 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             printf("\t\t\t\t\t PACKAGE       >>>>>>>>>>>>>>> %c\n", deads[index].package);
             printf("\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads[index].qoute);
             printf("\n\t\t\t\t    =============================================================\n");
+            // prompt th user on what to update
             printf("\t\t\t\t\t\tChoose what to update:\n\n");
             printf("\t\t\t\t\t\t    1 => Name\n");
             printf("\t\t\t\t\t\t    2 => Date of Birth\n");
@@ -1238,9 +1290,10 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             case 6:
                 system("cls");
                 sleep(0.5);
-                printf("\n\n\n\n\t\t\t\t\t\t Invalid Input. Try Again\n\n");
-                sleep(2.5);
+                printf("\n\n\n\n\t\t\t\t\t\t Removing Data.....\n\n\n");
+                sleep(2);
                 deads[index] = empty;
+                strcpy(lotdet[index].status, "Free");
                 break;
             default:
                 system("cls");
@@ -1249,12 +1302,14 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
                 sleep(2.5);
                 break;
             }
+
         } while (option != 1 && option != 2 && option != 3 && option != 4 && option != 5 && option != 6);
 
         cMonth(deads[index].BirthMonth, b2mont);
         cMonth(deads[index].DeathMonth, d2mont);
         do
         {
+            // print updated info
             system("cls");
             sleep(1);
             printf("\n\n\n\t\t\t\t\t\t Please confirm the details below:\n\n");
@@ -1268,6 +1323,7 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             printf("\t\t\t\t\t QOUTE         >>>>>>>>>>>>>>> %s\n", deads[index].qoute);
             printf("\n\t\t\t\t    =============================================================\n");
 
+            // Ask confirmation
             printf("\n\t\t\t\t\t\t Choose one of the Options below:\n\n");
             printf("\t\t\t\t\t\t    1 => Confirm\n");
             printf("\t\t\t\t\t\t    2 => Again\n");
@@ -1276,13 +1332,13 @@ void update(int index, char colid, int row_id, Info deads[MAX_ENT], Info empty, 
             scanf("%d", &check);
             switch (check)
             {
-            case 1:
+            case 1: // Confirm ---> Save info
                 Save(deads, lotdet, ifp, lfp);
                 return;
                 break;
-            case 2:
+            case 2: // Update something Again
                 break;
-            case 3:
+            case 3: // If cancel set the info back into its original datas
                 deads[index] = ifcancel;
                 return;
             default:
