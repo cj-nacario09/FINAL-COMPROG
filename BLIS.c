@@ -371,105 +371,107 @@ int main()
                 switch (Pckg_menu)
                 {
                 case 1: // Avail a package
-                    system("cls");
-                    sleep(1);
-                    PLot(Lot);
-                    printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
-                    scanf(" %c-%d", &colid, &row_id);
-                    // get user input for lot ID
-                    column_id = toupper(colid) - 'A';
-                    // get column id from int to char
-                    index = ((row_id - 1) * Max_row) + column_id;
-
-                    if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row) // invalid input
-                    {
-                        printf("\t\t\t\t    Not an option. Try again.\n\n");
-                        sleep(1);
-                    }
-                    else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0) // if lot is taken
-                    {
-                        printf("\n\t\t\t\t    Lot is already taken\n");
-                        sleep(1);
-                    }
-                    else // else means available
+                    do
                     {
                         system("cls");
-                        sleep(0.5);
-                        deads[index] = Register(entry_again, curr_year, column_id, row_id);
-                        do
+                        sleep(1);
+                        PLot(Lot);
+                        printf("\n\t\t\t\t    Enter Lot ID (Column-Row): ");
+                        scanf(" %c-%d", &colid, &row_id);
+                        // get user input for lot ID
+                        column_id = toupper(colid) - 'A';
+                        // get column id from int to char
+                        index = ((row_id - 1) * Max_row) + column_id;
+
+                        if (column_id < 0 || column_id > Max_col || row_id < 0 || row_id > Max_row) // invalid input
+                        {
+                            printf("\t\t\t\t    Not an option. Try again.\n\n");
+                            sleep(1);
+                        }
+                        else if (strcmp(lotdet[index].status, "taken") == 0 && strcmp(deads[index].fullname, "") != 0) // if lot is taken
+                        {
+                            printf("\n\t\t\t\t    Lot is already taken\n");
+                            sleep(1);
+                        }
+                        else // else means available
                         {
                             system("cls");
                             sleep(0.5);
-                            printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
-                            printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
-                            printf("\t\t\t\t\t\t    1 => Proceed to Payment\n");
-                            printf("\t\t\t\t\t\t    2 => Cancel\n");
-                            printf("\n\t\t\t\t\t\t  Option: ");
-                            scanf("%d", &Pay_menu);
-
-                            switch (Pay_menu)
+                            deads[index] = Register(entry_again, curr_year, column_id, row_id);
+                            do
                             {
-                            case 1:
-                                packagePrice = getPackagePrice(deads[index].package);
-                                do
+                                system("cls");
+                                sleep(0.5);
+                                printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                                printf("\t\t\t\t\t\tChoose one of the Options below:\n\n");
+                                printf("\t\t\t\t\t\t    1 => Proceed to Payment\n");
+                                printf("\t\t\t\t\t\t    2 => Cancel\n");
+                                printf("\n\t\t\t\t\t\t  Option: ");
+                                scanf("%d", &Pay_menu);
+
+                                switch (Pay_menu)
                                 {
-                                    system("cls");
-                                    sleep(0.5);
-                                    // Display payment details
-                                    printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
-                                    printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
-                                    printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
-                                    printf("\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet[index].Price);
-                                    printf("\n\t\t\t\t    =============================================================\n\n");
-
-                                    printf("\t\t\t\t\t\t    1 => Confirm\n");
-                                    printf("\t\t\t\t\t\t    2 => Cancel\n");
-                                    printf("\n\t\t\t\t\t\t   Option: ");
-                                    scanf("%d", &confirm_menu);
-
-                                    switch (confirm_menu)
+                                case 1:
+                                    packagePrice = getPackagePrice(deads[index].package);
+                                    do
                                     {
-                                    case 1: // confirm payment
-                                        MarkLot(Lot, deads[index]);
-                                        strcpy(lotdet[index].status, "taken");
                                         system("cls");
                                         sleep(0.5);
-                                        printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
-                                        PLot(Lot);
-                                        sleep(4);
-                                        print_rcpt(lotdet[index], deads[index], packagePrice);
-                                        history(lotdet[index], deads[index], packagePrice);
-                                        sleep(1);
-                                        printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
-                                        sleep(1);
-                                        break;
-                                    case 2: // cancel payment
-                                        deads[index] = empty;
-                                        break;
-                                    default:
-                                        printf("\t\t\t\t\t\t Not an option, Try Again\n");
-                                        sleep(1);
-                                        printf("\n");
-                                        break;
-                                    }
+                                        // Display payment details
+                                        printf("\n\n\n\n\t\t\t\t    =============================================================\n\n");
+                                        printf("\t\t\t\t\t PACKAGE PRICE >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice);
+                                        printf("\t\t\t\t\t LOT PRICE     >>>>>>>>>>>>>>> PHP %d\n", lotdet[index].Price);
+                                        printf("\t\t\t\t\t TOTAL         >>>>>>>>>>>>>>> PHP %.2f\n", packagePrice + lotdet[index].Price);
+                                        printf("\n\t\t\t\t    =============================================================\n\n");
 
-                                } while (confirm_menu != 1 && confirm_menu != 2);
-                                break;
-                            case 2:
-                                deads[index] = empty;
-                                system("cls");
-                                break;
-                            default:
-                                printf("\t\t\t\t\t\t Not an option, Try Again\n");
-                                sleep(1);
-                                break;
-                            }
+                                        printf("\t\t\t\t\t\t    1 => Confirm\n");
+                                        printf("\t\t\t\t\t\t    2 => Cancel\n");
+                                        printf("\n\t\t\t\t\t\t   Option: ");
+                                        scanf("%d", &confirm_menu);
 
-                        } while (Pay_menu != 2 && Pay_menu != 1 && Pay_menu != 3);
-                        // Loop until valid payment option is chosen
-                    }
+                                        switch (confirm_menu)
+                                        {
+                                        case 1: // confirm payment
+                                            MarkLot(Lot, deads[index]);
+                                            strcpy(lotdet[index].status, "taken");
+                                            system("cls");
+                                            sleep(0.5);
+                                            printf("\n\n\t\t\t\t    =====================>  ENTRY SAVED <========================\n");
+                                            PLot(Lot);
+                                            sleep(4);
+                                            print_rcpt(lotdet[index], deads[index], packagePrice);
+                                            history(lotdet[index], deads[index], packagePrice);
+                                            sleep(1);
+                                            printf("\n\n\n\n\n\n\n\n\n\n\n\t\t\t\t\t\tYou have succesfully registered...");
+                                            sleep(1);
+                                            break;
+                                        case 2: // cancel payment
+                                            deads[index] = empty;
+                                            break;
+                                        default:
+                                            printf("\t\t\t\t\t\t Not an option, Try Again\n");
+                                            sleep(1);
+                                            printf("\n");
+                                            break;
+                                        }
 
-                    break;
+                                    } while (confirm_menu != 1 && confirm_menu != 2);
+                                    break;
+                                case 2:
+                                    deads[index] = empty;
+                                    system("cls");
+                                    break;
+                                default:
+                                    printf("\t\t\t\t\t\t Not an option, Try Again\n");
+                                    sleep(1);
+                                    break;
+                                }
+
+                            } while (Pay_menu != 2 && Pay_menu != 1 && Pay_menu != 3);
+                            // Loop until valid payment option is chosen
+                            break;
+                        }
+                    } while (1);
                 case 2: // Main menu
                     system("cls");
                     sleep(2);
