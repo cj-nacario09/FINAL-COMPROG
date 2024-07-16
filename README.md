@@ -1,7 +1,7 @@
 # BLIS - Blissful Cemetery Management System
 
 ## Introduction
-BLIS (Burial Lot Information System) aims to simplify and modernize cemetery operations. With BLIS, users can easily access detailed information about available burial plots, including their location, occupancy status, pricing, and ownership details. The system provides a centralized database that ensures accurate record-keeping and simplifies the process of lot reservation, sale, and management.
+BLIS (Blissful Cemetery Management System) aims to simplify and modernize cemetery operations. With BLIS, users can easily access detailed information about available burial plots, including their location, occupancy status, pricing, and ownership details. The system provides a centralized database that ensures accurate record-keeping and simplifies the process of lot reservation, sale, and management.
 
 ## Features
 
@@ -14,18 +14,18 @@ BLIS (Burial Lot Information System) aims to simplify and modernize cemetery ope
 
 ### X == OCCUPIED 
 
-                                                                      | A | B | C | D | E | F | G | H | I | J |
-                                                                      |---|---|---|---|---|---|---|---|---|---|
-                                                                      | X | X | X | X | X | X | X | X | X | X | 1
-                                                                      | X |   |   | X |   | X | X | X |   |   | 2
-                                                                      |   | X |   | X | X |   |   |   |   | X | 3
-                                                                      | X |   |   |   |   | X | X | X |   |   | 4
-                                                                      | X | X | X | X | X | X | X | X | X | X | 5
-                                                                      |   | X |   | X | X |   |   |   |   | X | 6
-                                                                      | X |   |   | X |   | X | X | X |   |   | 7
-                                                                      |   | X |   |   | X |   |   |   |   | X | 8
-                                                                      |   | X |   | X | X |   |   |   |   | X | 9
-                                                                      | X |   |   | X |   | X | X | X |   |   | 10
+| A | B | C | D | E | F | G | H | I | J |
+|---|---|---|---|---|---|---|---|---|---|
+| X | X | X | X | X | X | X | X | X | X | 1
+| X |   |   | X |   | X | X | X |   |   | 2
+|   | X |   | X | X |   |   |   |   | X | 3
+| X |   |   |   |   | X | X | X |   |   | 4
+| X | X | X | X | X | X | X | X | X | X | 5
+|   | X |   | X | X |   |   |   |   | X | 6
+| X |   |   | X |   | X | X | X |   |   | 7
+|   | X |   |   | X |   |   |   |   | X | 8
+|   | X |   | X | X |   |   |   |   | X | 9
+| X |   |   | X |   | X | X | X |   |   | 10
 
 ## Detailed Lot Information
 
