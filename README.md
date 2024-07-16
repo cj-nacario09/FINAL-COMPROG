@@ -1,7 +1,7 @@
-# BLIS - Blissful Cemetery Management System
+# BLIS - Burial Lot Information System
 
 ## Introduction
-BLIS (Blissful Cemetery Management System) aims to simplify and modernize cemetery operations. With BLIS, users can easily access detailed information about available burial plots, including their location, occupancy status, pricing, and ownership details. The system provides a centralized database that ensures accurate record-keeping and simplifies the process of lot reservation, sale, and management.
+BLIS (Burial Lot Information System) aims to simplify and modernize cemetery operations. With BLIS, users can easily access detailed information about available burial plots, including their location, occupancy status, pricing, and ownership details. The system provides a centralized database that ensures accurate record-keeping and simplifies the process of lot reservation, sale, and management.
 
 ## Features
 
